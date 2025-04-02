@@ -6,44 +6,41 @@
     <title>Premium Product | ₹5000</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-    <!-- Firebase Auth -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 </head>
 <body>
     <div class="product-card">
-        <div class="product-image animate-float">
+        <div class="product-image">
             <img src="product.jpg" alt="Premium Product">
         </div>
-        <h1 class="animate-fade">Premium Product</h1>
-        <p class="price animate-fade">₹5,000</p>
+        <h1>Premium Product</h1>
+        <p class="price">₹5,000</p>
         <p class="description">High-quality product with lifetime warranty</p>
-        
-        <form id="orderForm">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Your Email" required>
-            <input type="tel" placeholder="Phone Number" required>
-            <button type="submit">ORDER NOW</button>
-        </form>
 
+        <!-- Google Login -->
         <div class="auth-options">
-            <button id="googleLogin" class="auth-btn google">
+            <button id="googleLogin">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
                 Login with Google
             </button>
-            <button id="guestCheckout" class="auth-btn guest">Checkout as Guest</button>
+            <button id="logout" style="display:none;">Logout</button>
         </div>
+
+        <!-- Display User Info -->
+        <div id="userInfo" style="display:none;">
+            <img id="userPhoto" src="" alt="User Photo">
+            <p id="userName"></p>
+        </div>
+
+        <!-- Order Form -->
+        <form id="orderForm" style="display:none;">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <input type="tel" id="phone" placeholder="Phone Number" required>
+            <input type="text" id="address" placeholder="Your Address" required>
+            <button type="submit">ORDER NOW</button>
+        </form>
     </div>
 
-    <script>
-        // Firebase Config (Replace with your values)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-    </script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
