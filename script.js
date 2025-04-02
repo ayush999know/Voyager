@@ -1,85 +1,57 @@
+// Form Submission
+document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        name: e.target.elements[0].value,
+        email: e.target.elements[1].value,
+        phone: e.target.elements[2].value
+    };
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Modal functionality
-    const loginBtn = document.getElementById('login-btn');
-    const aboutBtn = document.getElementById('about-btn');
-    const cartBtn = document.getElementById('cart-btn');
-    const trackBtn = document.getElementById('track-btn');
-    const loginModal = document.getElementById('login-modal');
-    const aboutModal = document.getElementById('about-modal');
-    const closeBtns = document.querySelectorAll('.close-btn');
-    const addToCartBtn = document.querySelector('.add-to-cart');
-    const buyNowBtn = document.querySelector('.buy-now');
-    const cartCount = document.querySelector('.cart-count');
-    
-    let cartItems = 0;
-    
-    // Open modals
-    loginBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        loginModal.style.display = 'flex';
-    });
-    
-    aboutBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        aboutModal.style.display = 'flex';
-    });
-    
-    cartBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        alert(`You have ${cartItems} items in your cart.`);
-    });
-    
-    trackBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        alert('Order tracking feature coming soon!');
-    });
-    
-    // Close modals
-    closeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.closest('.modal').style.display = 'none';
+    // Save to localStorage
+    localStorage.setItem('lastOrder', JSON.stringify(formData));
+
+    // Send email via FormSubmit
+    try {
+        await fetch('https://formsubmit.co/ajax/ayush99know@gmail.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...formData, product: "Premium Product (₹5000)" })
         });
-    });
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal')) {
-            e.target.style.display = 'none';
-        }
-    });
-    
-    // Add to cart functionality
-    addToCartBtn.addEventListener('click', function() {
-        cartItems++;
-        cartCount.textContent = cartItems;
         
-        // Animation effect
-        this.textContent = 'Added!';
-        this.style.backgroundColor = '#3a7bd5';
-        this.style.borderColor = '#3a7bd5';
-        
-        setTimeout(() => {
-            this.textContent = 'Add to Cart';
-            this.style.backgroundColor = 'transparent';
-            this.style.borderColor = '#00d2ff';
-        }, 1000);
-    });
-    
-    // Buy now functionality
-    buyNowBtn.addEventListener('click', function() {
-        alert('Thank you for your purchase! The Voyager spacecraft will be delivered to your nearest spaceport shortly.');
-    });
-    
-    // Stars parallax effect
-    document.addEventListener('mousemove', function(e) {
-        const stars = document.querySelector('.stars');
-        const twinkling = document.querySelector('.twinkling');
-        
-        const moveX = e.clientX / window.innerWidth - 0.5;
-        const moveY = e.clientY / window.innerHeight - 0.5;
-        
-        stars.style.transform = `translate(${moveX * 30}px, ${moveY * 30}px)`;
-        twinkling.style.transform = `translate(${moveX * 60}px, ${moveY * 60}px)`;
-    });
+        window.location.href = 'order-success.html';
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+});
+
+// Google Auth
+const googleLoginBtn = document.getElementById('googleLogin');
+googleLoginBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then(() => {
+            alert("Logged in with Google!");
+            // Auto-fill email if available
+            const user = firebase.auth().currentUser;
+            if (user) document.getElementById('orderForm').elements[1].value = user.email;
+        })
+        .catch(console.error);
+});
+
+// Guest Checkout
+document.getElementById('guestCheckout').addEventListener('click', () => {
+    document.getElementById('orderForm').style.display = 'block';
+});
+
+// Auto-fill last order
+window.addEventListener('load', () => {
+    const lastOrder = localStorage.getItem('lastOrder');
+    if (lastOrder) {
+        const { name, email, phone } = JSON.parse(lastOrder);
+        const form = document.getElementById('orderForm');
+        form.elements[0].value = name;
+        form.elements[1].value = email;
+        form.elements[2].value = phone;
+    }
 });
