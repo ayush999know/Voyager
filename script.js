@@ -1,57 +1,83 @@
-// Form Submission
-document.getElementById('orderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        name: e.target.elements[0].value,
-        email: e.target.elements[1].value,
-        phone: e.target.elements[2].value
-    };
+import { auth, provider, db, signInWithPopup, signOut, collection, addDoc } from "./firebase-config.js";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-    // Save to localStorage
-    localStorage.setItem('lastOrder', JSON.stringify(formData));
+// Elements
+const googleLoginBtn = document.getElementById("googleLogin");
+const logoutBtn = document.getElementById("logout");
+const userInfo = document.getElementById("userInfo");
+const userPhoto = document.getElementById("userPhoto");
+const userName = document.getElementById("userName");
+const orderForm = document.getElementById("orderForm");
 
-    // Send email via FormSubmit
-    try {
-        await fetch('https://formsubmit.co/ajax/ayush99know@gmail.com', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...formData, product: "Premium Product (₹5000)" })
+// Google Login
+googleLoginBtn.addEventListener("click", () => {
+    signInWithPopup(auth, provider)
+        .then((result) => {
+            const user = result.user;
+            displayUserInfo(user);
+        })
+        .catch((error) => {
+            alert("Login Failed: " + error.message);
         });
-        
-        window.location.href = 'order-success.html';
-    } catch (error) {
-        alert('Error: ' + error.message);
+});
+
+// Logout
+logoutBtn.addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            userInfo.style.display = "none";
+            logoutBtn.style.display = "none";
+            googleLoginBtn.style.display = "block";
+            orderForm.style.display = "none";
+        })
+        .catch((error) => {
+            alert("Logout Failed: " + error.message);
+        });
+});
+
+// Display User Info
+function displayUserInfo(user) {
+    userPhoto.src = user.photoURL;
+    userName.textContent = `Hello, ${user.displayName}`;
+    userInfo.style.display = "block";
+    logoutBtn.style.display = "block";
+    googleLoginBtn.style.display = "none";
+    orderForm.style.display = "block";
+
+    // Autofill name & email
+    document.getElementById("name").value = user.displayName;
+    document.getElementById("email").value = user.email;
+}
+
+// Detect Auth State
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        displayUserInfo(user);
     }
 });
 
-// Google Auth
-const googleLoginBtn = document.getElementById('googleLogin');
-googleLoginBtn.addEventListener('click', () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then(() => {
-            alert("Logged in with Google!");
-            // Auto-fill email if available
-            const user = firebase.auth().currentUser;
-            if (user) document.getElementById('orderForm').elements[1].value = user.email;
-        })
-        .catch(console.error);
-});
+// Handle Order Submission
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-// Guest Checkout
-document.getElementById('guestCheckout').addEventListener('click', () => {
-    document.getElementById('orderForm').style.display = 'block';
-});
+    const formData = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        product: "Premium Product (₹5000)"
+    };
 
-// Auto-fill last order
-window.addEventListener('load', () => {
-    const lastOrder = localStorage.getItem('lastOrder');
-    if (lastOrder) {
-        const { name, email, phone } = JSON.parse(lastOrder);
-        const form = document.getElementById('orderForm');
-        form.elements[0].value = name;
-        form.elements[1].value = email;
-        form.elements[2].value = phone;
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "orders"), formData);
+        alert("Order Placed Successfully!");
+        window.location.href = "order-success.html";
+    } catch (error) {
+        alert("Error Placing Order: " + error.message);
     }
 });
