@@ -1,1 +1,67 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novardent - Space Exploration</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <header class="top-bar">
+        <div class="logo">NOVARDENT</div>
+        <nav>
+            <ul>
+                <li><a href="#" id="login-btn">Login</a></li>
+                <li><a href="#" id="about-btn">About</a></li>
+                <li><a href="#" id="cart-btn">Your Cart <span class="cart-count">0</span></a></li>
+                <li><a href="#" id="track-btn">Track Your Order</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Voyager Spacecraft">
+                <div class="stars-overlay"></div>
+            </div>
+            <div class="product-info">
+                <h2>Voyager</h2>
+                <p class="product-description">The ultimate in interstellar travel technology. Explore the cosmos like never before with our flagship spacecraft.</p>
+                <div class="price">$1,299,999</div>
+                <div class="product-actions">
+                    <button class="buy-now">Buy Now</button>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Login to Novardent</h2>
+            <form>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>About Novardent</h2>
+            <p>Novardent is a premier space technology company dedicated to making interstellar travel accessible to everyone. Founded in 2023, we combine cutting-edge technology with visionary design to create spacecraft that redefine exploration.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
