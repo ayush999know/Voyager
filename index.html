@@ -63,27 +63,56 @@
             }
         }
 
-        /* Space Background */
-        .stars, .twinkling {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
+        @keyframes iconRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(15deg);
+            }
+            50% {
+                transform: rotate(0deg);
+            }
+            75% {
+                transform: rotate(-15deg);
+            }
+            100% {
+                transform: rotate(0deg);
+            }
         }
 
-        .stars {
-            background: #000 url('https://www.script-tutorials.com/demos/360/images/stars.png') repeat top center;
+        /* Enhanced Space Background */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -2;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+            animation-delay: var(--delay);
+            opacity: 0;
+            transform: translateZ(0);
+            will-change: transform, opacity;
         }
 
         .twinkling {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: transparent url('https://www.script-tutorials.com/demos/360/images/twinkling.png') repeat top center;
             z-index: -1;
             animation: rotate 200s linear infinite;
+            opacity: 0.5;
         }
 
         /* Header Styles */
@@ -126,6 +155,15 @@
 
         .nav-link:hover {
             color: #6495ed;
+        }
+
+        .nav-link i {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            animation: iconRotate 0.5s ease;
+            transform: scale(1.2);
         }
 
         .nav-link::after {
@@ -274,6 +312,12 @@
             overflow: hidden;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.02);
         }
 
         .product-image img {
@@ -538,58 +582,305 @@
             100% { transform: translate(100vw, 100vh) rotate(-45deg); opacity: 0; }
         }
 
-        /* Space Gallery */
-        .space-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            padding: 50px 5%;
-            background: rgba(15, 15, 35, 0.3);
+        /* Enhanced Space Gallery Section */
+        .space-gallery-section {
+            padding: 100px 5%;
+            position: relative;
+            overflow: hidden;
+            background: rgba(10, 10, 30, 0.3);
             backdrop-filter: blur(5px);
         }
-
-        .gallery-item {
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: #a7c7e7;
+            text-shadow: 0 0 15px rgba(100, 149, 237, 0.7);
             position: relative;
-            width: 300px;
-            height: 200px;
-            overflow: hidden;
-            border-radius: 10px;
-            border: 2px solid rgba(100, 149, 237, 0.5);
-            transition: all 0.5s ease;
-            cursor: pointer;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
         }
-
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6495ed, transparent);
+        }
+        
+        .space-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+        
+        .gallery-item {
+            perspective: 1000px;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s forwards;
+            animation-delay: calc(var(--item-index) * 0.1s);
+            transition: transform 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .gallery-item-inner {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        
+        .gallery-item:hover .gallery-item-inner {
+            transform: rotateY(5deg) rotateX(5deg) scale(1.05);
+            box-shadow: 0 15px 40px rgba(100, 149, 237, 0.5);
+        }
+        
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
+            transform: translateZ(0);
+            will-change: transform;
         }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(100, 149, 237, 0.7);
-            border-color: #6495ed;
-        }
-
+        
         .gallery-item:hover img {
             transform: scale(1.1);
         }
-
+        
         .gallery-caption {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 20px;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transition: all 0.5s ease;
+            color: #fff;
         }
-
+        
+        .gallery-caption h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #a7c7e7;
+        }
+        
+        .gallery-caption p {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .view-more-btn {
+            background: rgba(100, 149, 237, 0.3);
+            color: #fff;
+            border: 1px solid #6495ed;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .view-more-btn:hover {
+            background: rgba(100, 149, 237, 0.5);
+            transform: translateY(-2px);
+        }
+        
         .gallery-item:hover .gallery-caption {
             transform: translateY(0);
+        }
+        
+        /* Product Lightbox Styles */
+        .product-lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .product-lightbox.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .product-lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 20, 50, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(100, 149, 237, 0.5);
+            animation: lightboxFadeIn 0.5s ease;
+        }
+        
+        @keyframes lightboxFadeIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .product-lightbox-slider {
+            display: flex;
+            width: 100%;
+            height: 80%;
+            transition: transform 0.5s ease;
+        }
+        
+        .product-lightbox-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .product-lightbox-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        
+        .product-lightbox-caption {
+            padding: 20px;
+            text-align: center;
+            background: rgba(10, 10, 30, 0.8);
+            height: 20%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .product-lightbox-title {
+            color: #a7c7e7;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .product-lightbox-description {
+            color: #ccc;
+            font-size: 1rem;
+        }
+        
+        .product-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .product-close-btn:hover {
+            color: #6495ed;
+            transform: rotate(90deg);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .product-lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1;
+        }
+        
+        .product-lightbox-prev,
+        .product-lightbox-next {
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .product-lightbox-prev:hover,
+        .product-lightbox-next:hover {
+            color: #6495ed;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .product-lightbox-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 1;
+        }
+        
+        .product-lightbox-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .product-lightbox-indicator.active {
+            background: #6495ed;
+            transform: scale(1.2);
         }
 
         /* Space Facts Section */
@@ -842,7 +1133,7 @@
         }
 
         .form-group textarea {
-            height: 150px;
+            min-height: 100px;
             resize: vertical;
         }
 
@@ -1003,6 +1294,119 @@
             opacity: 1;
         }
 
+        /* Terms Modal Styles */
+        .terms-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .terms-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .terms-content {
+            background: linear-gradient(to bottom, #0f0c29, #302b63);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(100, 149, 237, 0.5);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            position: relative;
+            overflow-y: auto;
+            animation: modalFadeIn 0.5s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .terms-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(100, 149, 237, 0.3);
+        }
+
+        .terms-title {
+            color: #a7c7e7;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(167, 199, 231, 0.5);
+        }
+
+        .terms-close {
+            color: #a7c7e7;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(25, 25, 60, 0.5);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .terms-close:hover {
+            color: #6495ed;
+            transform: rotate(90deg);
+        }
+
+        .terms-body {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .terms-body p {
+            margin-bottom: 15px;
+        }
+
+        .terms-highlight {
+            color: #a7c7e7;
+            font-weight: bold;
+        }
+
+        .terms-contact {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 149, 237, 0.3);
+        }
+
+        .terms-contact a {
+            color: #6495ed;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .terms-contact a:hover {
+            text-decoration: underline;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .space-header {
@@ -1037,9 +1441,21 @@
                 justify-content: center;
             }
 
-            .space-gallery img {
-                width: 100%;
-                max-width: 300px;
+            .space-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .gallery-item-inner {
+                height: 200px;
+            }
+            
+            .gallery-caption h3 {
+                font-size: 1.1rem;
+            }
+            
+            .gallery-caption p {
+                font-size: 0.8rem;
             }
 
             #gameCanvas {
@@ -1064,11 +1480,37 @@
                 font-size: 0.9rem;
                 min-width: 60px;
             }
+            
+            .product-lightbox-content {
+                width: 95%;
+                height: 95%;
+            }
+            
+            .product-lightbox-nav {
+                padding: 0 10px;
+            }
+            
+            .product-lightbox-prev,
+            .product-lightbox-next {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .terms-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .terms-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="stars"></div>
+    <!-- Enhanced Star Background -->
+    <div class="stars-container" id="starsContainer"></div>
     <div class="twinkling"></div>
     
     <header class="space-header" id="header">
@@ -1081,6 +1523,9 @@
                     <li><a href="#facts" class="nav-link" data-text="Facts"><i class="fas fa-info-circle"></i> Facts</a></li>
                     <li><a href="#game" class="nav-link" data-text="Game"><i class="fas fa-gamepad"></i> Game</a></li>
                     <li><a href="#order" class="nav-link" data-text="Order"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="#" class="nav-link" data-text="Login"><i class="fas fa-user-astronaut"></i> Login</a></li>
+                    <li><a href="#" class="nav-link" data-text="Cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="#" class="nav-link" data-text="Track"><i class="fas fa-rocket"></i> Track</a></li>
                 </ul>
             </nav>
         </div>
@@ -1092,7 +1537,7 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Voyager Spacecraft</h1>
+            <h1>Sound of Earth</h1>
             <p>The ultimate space exploration device for interstellar travel</p>
             <a href="#product" class="btn buy-now pulse">
                 <span>Explore Product</span>
@@ -1105,17 +1550,18 @@
     <!-- Product Section -->
     <main class="product-container" id="product">
         <div class="product-card">
-            <div class="product-image">
-                <img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager Spacecraft" class="floating">
+            <div class="product-image" id="productImage">
+                <img src="image/product.jpg" alt="Sound of Earth Product" class="floating">
                 <div class="stars-overlay"></div>
             </div>
             <div class="product-info">
-                <h2 class="product-title">Voyager</h2>
-                <p class="product-description">The ultimate space exploration device. Equipped with quantum propulsion and interstellar navigation systems to take you beyond the stars. Experience the cosmos like never before with our state-of-the-art spacecraft technology.</p>
-                <div class="price">$1,299,999</div>
+                <h2 class="product-title">Sound of Earth</h2>
+                <p class="product-description">Own a masterpiece inspired by Voyager 1's Golden Record. Featuring a sleek plastic body with a stunning golden disk, this collector's piece lets you experience the legendary sounds of Earth at the touch of a button or via a web app. Its magnetic two-part design allows for wall mounting or desk display, while USB Type-C charging provides up to 4 hours of playback.
+                    More than a collectible, Sound of Earth is a tribute to exploration, history, and the human spirit.</p>
+                <div class="price">₹5000</div>
                 
                 <div class="product-options">
-                    <button class="btn buy-now pulse" id="buyNowBtn">
+                    <button class="btn buy-now pulse" id="buyNowBtn" onclick="window.location.href='#order'">
                         <span>Buy Now</span>
                         <div class="flare"></div>
                     </button>
@@ -1127,28 +1573,32 @@
                 
                 <div class="product-features">
                     <div class="feature">
-                        <i class="fas fa-lightbulb"></i>
-                        <span>Quantum Engine</span>
+                        <i class="fas fa-magnet"></i>
+                        <span>Magnetic locking</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Plasma Shields</span>
+                        <i class="fas fa-anchor"></i>
+                        <span>Built-in wall hook</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-compass"></i>
-                        <span>Interstellar GPS</span>
+                        <i class="fas fa-battery-full"></i>
+                        <span>Rechargeable, 3-hour battery</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-bed"></i>
-                        <span>Cryo-Sleep Pods</span>
+                        <i class="fas fa-wifi"></i>
+                        <span>WiFi control</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-satellite-dish"></i>
-                        <span>FTL Communication</span>
+                        <i class="fas fa-volume-up"></i>
+                        <span>Dual speakers</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-atom"></i>
-                        <span>Anti-Matter Drive</span>
+                        <i class="fas fa-moon"></i>
+                        <span>Sleep & Country modes</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-globe"></i>
+                        <span>Earth & space sounds</span>
                     </div>
                 </div>
             </div>
@@ -1161,36 +1611,96 @@
         </div>
     </main>
 
+    <!-- Product Lightbox -->
+    <div class="product-lightbox" id="productLightbox">
+        <div class="product-lightbox-content">
+            <span class="product-close-btn" id="productCloseBtn">&times;</span>
+            <div class="product-lightbox-slider" id="productSlider">
+                <!-- Slides will be added dynamically -->
+            </div>
+            <div class="product-lightbox-nav">
+                <div class="product-lightbox-prev" id="productPrevBtn"><i class="fas fa-chevron-left"></i></div>
+                <div class="product-lightbox-next" id="productNextBtn"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="product-lightbox-indicators" id="productIndicators">
+                <!-- Indicators will be added dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Space Gallery Section -->
     <section class="space-gallery-section" id="gallery">
         <h2 class="section-title">Voyager in Action</h2>
         <div class="space-gallery">
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager near galaxy">
-                <div class="gallery-caption">Voyager exploring distant galaxy</div>
+            <!-- Voyager 1 Launch -->
+            <div class="gallery-item" style="--item-index: 0">
+                <div class="gallery-item-inner">
+                    <img src="https://photojournal.jpl.nasa.gov/jpeg/PIA01480.jpg" alt="Voyager 2 Launch" loading="lazy">
+                    <div class="gallery-caption">
+                        <h3>Voyager 2 Launch</h3>
+                        <p>Voyager 2 launching from NASA Kennedy Space Center on August 20, 1977</p>
+                        <button class="view-more-btn">View Details</button>
+                    </div>
+                </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager in nebula">
-                <div class="gallery-caption">Navigating through stellar nebula</div>
+            <!-- Jupiter Close-up -->
+            <div class="gallery-item" style="--item-index: 1">
+                <div class="gallery-item-inner">
+                    <img src="https://photojournal.jpl.nasa.gov/jpeg/PIA00029.jpg" alt="Voyager's view of Jupiter" loading="lazy">
+                    <div class="gallery-caption">
+                        <h3>Jupiter Close-up</h3>
+                        <p>Voyager 1's view of Jupiter during its 1979 flyby</p>
+                        <button class="view-more-btn">View Details</button>
+                    </div>
+                </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1454789548928-9efd52dc4031?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager interior">
-                <div class="gallery-caption">Luxurious spacecraft interior</div>
+            <!-- The Golden Record -->
+            <div class="gallery-item" style="--item-index: 2">
+                <div class="gallery-item-inner">
+                    <img src="https://photojournal.jpl.nasa.gov/jpeg/PIA14113.jpg" alt="Voyager's Golden Record" loading="lazy">
+                    <div class="gallery-caption">
+                        <h3>The Golden Record</h3>
+                        <p>Close-up of Voyager's Golden Record containing sounds of Earth</p>
+                        <button class="view-more-btn">View Details</button>
+                    </div>
+                </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1464802686167-b939a6910659?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager star view">
-                <div class="gallery-caption">Stellar observation deck</div>
+            <!-- Saturn and Its Rings -->
+            <div class="gallery-item" style="--item-index: 3">
+                <div class="gallery-item-inner">
+                    <img src="https://photojournal.jpl.nasa.gov/jpeg/PIA02230.jpg" alt="Voyager's view of Saturn" loading="lazy">
+                    <div class="gallery-caption">
+                        <h3>Saturn and Its Rings</h3>
+                        <p>Voyager 1's stunning view of Saturn during its 1980 flyby</p>
+                        <button class="view-more-btn">View Details</button>
+                    </div>
+                </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1506443432602-ac2fcd6f54e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager crew">
-                <div class="gallery-caption">Professional crew included</div>
-            </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Voyager speed">
-                <div class="gallery-caption">Faster-than-light travel</div>
+            <!-- Pale Blue Dot -->
+            <div class="gallery-item" style="--item-index: 4">
+                <div class="gallery-item-inner">
+                    <img src="https://photojournal.jpl.nasa.gov/jpeg/PIA23645.jpg" alt="Pale Blue Dot" loading="lazy">
+                    <div class="gallery-caption">
+                        <h3>Pale Blue Dot</h3>
+                        <p>Earth as seen from 6 billion kilometers away - the famous "Pale Blue Dot"</p>
+                        <button class="view-more-btn">View Details</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <span class="close-btn">&times;</span>
+            <img class="lightbox-image" src="" alt="">
+            <div class="lightbox-caption">
+                <h3 class="lightbox-title"></h3>
+                <p class="lightbox-description"></p>
+            </div>
+        </div>
+    </div>
 
     <!-- Space Facts Section -->
     <section class="space-facts" id="facts">
@@ -1210,32 +1720,32 @@
         <h2 class="section-title">What Our Customers Say</h2>
         <div class="testimonial-container">
             <div class="testimonial-card">
-                <p class="testimonial-text">"The Voyager spacecraft exceeded all my expectations. The quantum engine made the trip to Alpha Centauri feel like a weekend getaway. Worth every credit!"</p>
+                <p class="testimonial-text">"As a lifelong space enthusiast, this is the best collectible I've ever owned! The golden disk looks stunning, and the sound quality is amazing. The fact that it plays the actual Voyager sounds makes it feel like owning a piece of space history. Highly recommend!"</p>
                 <div class="testimonial-author">
                     <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Elon Tusk" class="author-avatar">
                     <div class="author-info">
                         <h4>Elon Tusk</h4>
-                        <p>Mars Colony Founder</p>
+                        <p>USA</p>
                     </div>
                 </div>
             </div>
             <div class="testimonial-card">
-                <p class="testimonial-text">"As an astrophysicist, I'm impressed by the engineering. As a space tourist, I'm thrilled by the comfort. The cryo-sleep pods are revolutionary!"</p>
+                <p class="testimonial-text">"Bought this for my brother, who loves astronomy, and he was blown away! The magnetic design is super cool, and the ability to control it via WiFi is a game-changer. It's not just a display piece—it's an experience! Worth every penny!"</p>
                 <div class="testimonial-author">
                     <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr. Jane Smith" class="author-avatar">
                     <div class="author-info">
                         <h4>Dr. Jane Smith</h4>
-                        <p>Chief Scientist, NASA</p>
+                        <p>England</p>
                     </div>
                 </div>
             </div>
             <div class="testimonial-card">
-                <p class="testimonial-text">"I've traveled on many spacecraft, but Voyager is in a league of its own. The FTL communication kept me connected to my businesses back on Earth."</p>
+                <p class="testimonial-text">"I expected a nice collectible, but this exceeded my expectations! The wall-mount option, dual speakers, and Earth & space sounds make it so unique. It's both a conversation starter and a relaxing sound experience. If you love space, just buy it!"</p>
                 <div class="testimonial-author">
                     <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Richard Branford" class="author-avatar">
                     <div class="author-info">
                         <h4>Richard Branford</h4>
-                        <p>CEO, Galactic Enterprises</p>
+                        <p>Australia</p>
                     </div>
                 </div>
             </div>
@@ -1245,14 +1755,14 @@
     <!-- Space Game Section -->
     <section class="space-game-container" id="game">
         <div class="game-header">
-            <h2 class="game-title">Novardent Space Explorer</h2>
+            <h2 class="game-title">Novardent Space Defender</h2>
             <div id="gameScore">Score: 0</div>
         </div>
         
         <div class="game-canvas-container">
             <canvas id="gameCanvas" width="600" height="400"></canvas>
             <div class="game-overlay" id="gameOverlay">
-                <div class="game-over-text">Space Explorer</div>
+                <div class="game-over-text">Space Defender</div>
                 <div class="final-score">Score: 0</div>
                 <button class="start-btn" id="startBtn">Start Game</button>
             </div>
@@ -1261,14 +1771,13 @@
         <div class="game-controls">
             <button class="game-btn" id="leftBtn"><i class="fas fa-arrow-left"></i> Left</button>
             <button class="game-btn" id="rightBtn"><i class="fas fa-arrow-right"></i> Right</button>
-            <button class="game-btn" id="upBtn"><i class="fas fa-arrow-up"></i> Up</button>
-            <button class="game-btn" id="downBtn"><i class="fas fa-arrow-down"></i> Down</button>
             <button class="game-btn fire-btn" id="fireBtn"><i class="fas fa-bolt"></i> Fire</button>
         </div>
         
         <p class="game-instructions">
-            Use arrow keys or buttons to move your spaceship. Collect stars (★) for 10 points. 
-            Shoot asteroids (●) with Fire button for 20 points each. Avoid asteroid collisions!
+            Use arrow keys or buttons to move your spaceship. 
+            Shoot aliens (👽) for 20 points each. 
+            Dodge the moving asteroids (●) - they'll destroy your ship!
         </p>
     </section>
 
@@ -1278,34 +1787,26 @@
         <form class="order-form" id="orderForm">
             <div class="form-group">
                 <label for="name">Full Name</label>
-                <input type="text" id="name" required placeholder="Enter your full name">
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
             </div>
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="Enter your email">
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="address">Shipping Address</label>
+                <textarea id="address" name="address" required placeholder="Enter your complete shipping address"></textarea>
             </div>
             <div class="form-group">
                 <label for="model">Voyager Model</label>
-                <select id="model" required>
+                <select id="model" name="model" required>
                     <option value="">Select a model</option>
-                    <option value="explorer">Explorer Edition ($1,299,999)</option>
-                    <option value="luxury">Luxury Edition ($1,899,999)</option>
-                    <option value="enterprise">Enterprise Edition ($2,499,999)</option>
+                    <option value="Explorer Edition">Explorer Edition (₹5000)</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="delivery">Preferred Delivery Orbit</label>
-                <select id="delivery" required>
-                    <option value="">Select delivery orbit</option>
-                    <option value="leo">Low Earth Orbit</option>
-                    <option value="geo">Geostationary Orbit</option>
-                    <option value="lunar">Lunar Orbit</option>
-                    <option value="mars">Mars Transfer Orbit</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="notes">Special Requirements</label>
-                <textarea id="notes" placeholder="Any special customization requests?"></textarea>
+                <label for="notes">Special Requirements (Optional)</label>
+                <textarea id="notes" name="notes" placeholder="Any special customization requests?"></textarea>
             </div>
             <button type="submit" class="submit-btn">Place Order</button>
         </form>
@@ -1320,22 +1821,115 @@
             <a href="#facts" class="footer-link">Space Facts</a>
             <a href="#game" class="footer-link">Game</a>
             <a href="#order" class="footer-link">Order</a>
-            <a href="#" class="footer-link">Terms</a>
+            <a href="#" class="footer-link" id="termsLink">Terms</a>
             <a href="#" class="footer-link">Privacy</a>
         </div>
         <div class="social-links">
-            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/nat_3_141?s=21" class="social-link" target="_blank">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="social-link">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.instagram.com/nat_3.141?igsh=MWY4cDVmd2FiNWZ4ag%3D%3D&utm_source=qr" class="social-link" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="social-link">
+                <i class="fab fa-youtube"></i>
+            </a>
         </div>
-        <p class="footer-text">© 2023 Novardent Space Technologies | All Rights Reserved</p>
+        
+        <p class="footer-text">© 2025 Novardent | All Rights Reserved</p>
     </footer>
+
+    <!-- Terms Modal -->
+    <div class="terms-modal" id="termsModal">
+        <div class="terms-content">
+            <div class="terms-header">
+                <h2 class="terms-title">Terms & Conditions</h2>
+                <span class="terms-close" id="termsClose">&times;</span>
+            </div>
+            <div class="terms-body">
+                <p>By purchasing Sound of Earth from our website, you agree to our terms and conditions. The product is priced at <span class="terms-highlight">₹5000</span> and is a collector's item inspired by Voyager 1, featuring a golden disk, built-in sounds, WiFi control, and magnetic connectivity.</p>
+                
+                <p><span class="terms-highlight">Payments</span> must be made in full before shipping, and we accept UPI, credit/debit cards, and online banking.</p>
+                
+                <p><span class="terms-highlight">Shipping</span> is available in 50+ countries, with delivery estimated in 10-20 business days.</p>
+                
+                <p>Due to the <span class="terms-highlight">exclusive nature</span> of this product, returns and refunds are not available, except for damaged or defective items reported within 48 hours of delivery.</p>
+                
+                <p>The product includes a <span class="terms-highlight">6-month warranty</span> for manufacturing defects but excludes physical damage or misuse.</p>
+                
+                <p>We are not responsible for shipping delays, misuse, or unauthorized modifications.</p>
+                
+                <p>All <span class="terms-highlight">branding, images, and descriptions</span> are intellectual property and cannot be copied or resold.</p>
+                
+                <p>Your personal data will be handled per our Privacy Policy, and we ensure secure payment processing.</p>
+                
+                <p>By placing an order, you acknowledge and agree to these terms.</p>
+                
+                <div class="terms-contact">
+                    For inquiries, contact us at <a href="mailto:ayush99business@gmail.com">ayush99business@gmail.com</a>.
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="notification" id="notification"></div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Enhanced Star Background
+            function createStars() {
+                const starsContainer = document.getElementById('starsContainer');
+                const count = 200;
+                const maxDepth = 5;
+                
+                for (let i = 0; i < count; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    
+                    // Random positioning
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    
+                    // Random size and depth
+                    const depth = Math.floor(Math.random() * maxDepth) + 1;
+                    const size = 0.5 + Math.random() * 2;
+                    const duration = 2 + Math.random() * 3;
+                    const delay = Math.random() * 5;
+                    
+                    star.style.left = `${x}%`;
+                    star.style.top = `${y}%`;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.animationDuration = `${duration}s`;
+                    star.style.animationDelay = `${delay}s`;
+                    star.style.setProperty('--duration', `${duration}s`);
+                    star.style.setProperty('--delay', `${delay}s`);
+                    
+                    // Set depth (z-index) properties
+                    star.style.transform = `translateZ(${depth}px)`;
+                    star.style.opacity = 0.2 + (depth / maxDepth) * 0.8;
+                    
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            createStars();
+
+            // Parallax effect for stars on scroll
+            window.addEventListener('scroll', function() {
+                const stars = document.querySelectorAll('.star');
+                const scrollPosition = window.scrollY;
+                
+                stars.forEach(star => {
+                    const depth = parseFloat(star.style.transform.replace('translateZ(', '').replace('px)', '')) || 1;
+                    const movement = scrollPosition * (depth / 5);
+                    star.style.transform = `translate3d(0, ${movement}px, ${depth}px)`;
+                });
+            });
+
             // Header scroll effect
             const header = document.getElementById('header');
             window.addEventListener('scroll', function() {
@@ -1364,41 +1958,8 @@
                 
                 setTimeout(() => {
                     notification.classList.remove('show');
-                }, 3000);
+                }, 5000);
             }
-
-            // Create additional stars for background
-            function createStars() {
-                const starsContainer = document.querySelector('.stars');
-                const count = 200;
-                
-                for (let i = 0; i < count; i++) {
-                    const star = document.createElement('div');
-                    star.classList.add('star');
-                    
-                    // Random positioning
-                    const x = Math.random() * 100;
-                    const y = Math.random() * 100;
-                    
-                    // Random size
-                    const size = Math.random() * 3;
-                    
-                    // Random animation duration
-                    const duration = 2 + Math.random() * 3;
-                    const delay = Math.random() * 5;
-                    
-                    star.style.left = `${x}%`;
-                    star.style.top = `${y}%`;
-                    star.style.width = `${size}px`;
-                    star.style.height = `${size}px`;
-                    star.style.animationDuration = `${duration}s`;
-                    star.style.animationDelay = `${delay}s`;
-                    
-                    starsContainer.appendChild(star);
-                }
-            }
-
-            createStars();
 
             // Product image hover effect
             const productImage = document.querySelector('.product-image img');
@@ -1415,22 +1976,7 @@
 
             buyNowBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                showNotification('Voyager purchased! Preparing for launch...', 'fas fa-rocket');
-                
-                // Ripple effect
-                const ripple = document.createElement('span');
-                ripple.classList.add('ripple');
-                buyNowBtn.appendChild(ripple);
-                
-                const x = e.clientX - e.target.getBoundingClientRect().left;
-                const y = e.clientY - e.target.getBoundingClientRect().top;
-                
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 1000);
+                window.location.href = '#order';
             });
 
             addToCartBtn.addEventListener('click', (e) => {
@@ -1448,33 +1994,33 @@
             // Space Facts
             const spaceFacts = [
                 {
-                    title: "Space Travel is Becoming Reality",
-                    text: "Commercial space travel is no longer science fiction. With spacecraft like Voyager, private citizens can now experience the wonders of space firsthand. Our customers have already logged over 1,000 light-years of travel!",
+                    title: "Voyager 1 Is Still Calling Home from Deep Space",
+                    text: "Despite being launched in 1977, Voyager 1 is still transmitting data from over 15 billion miles away, making it the farthest human-made object from Earth!",
                     icon: "fas fa-rocket"
                 },
                 {
-                    title: "Quantum Engine Technology",
-                    text: "Our patented quantum engine allows for faster-than-light travel without violating Einstein's theories. By manipulating quantum foam, we create localized space-time bubbles that propel the spacecraft.",
+                    title: "The Golden Record Will Outlive Humanity",
+                    text: "The Golden Record is made of gold-plated copper and designed to last over a billion years in space—longer than any civilization on Earth!",
                     icon: "fas fa-atom"
                 },
                 {
-                    title: "Cryo-Sleep Safety",
-                    text: "Voyager's cryogenic sleep pods have a 100% safety record. Our advanced hibernation technology slows metabolism by 95% with zero side effects, making long journeys comfortable.",
+                    title: "It Contains a Cosmic Map Leading to Earth",
+                    text: "Engraved on the Golden Record is a pulsar map, which shows Earth's location in the galaxy—just in case an alien civilization finds it!",
                     icon: "fas fa-snowflake"
                 },
                 {
-                    title: "FTL Communication",
-                    text: "Stay connected across the galaxy with our faster-than-light communication system. Using quantum entanglement, you can video call Earth from Alpha Centauri with no delay!",
+                    title: "The Golden Record Almost Had The Beatles!",
+                    text: "NASA wanted to include (Here Comes the Sun) by The Beatles, but record label disputes prevented it from being added.",
                     icon: "fas fa-satellite"
                 },
                 {
-                    title: "Plasma Shield Protection",
-                    text: "Voyager's plasma shields can withstand impacts from micrometeorites traveling at 0.1% light speed. Even in asteroid fields, you're completely safe.",
+                    title: "It Carries the Sound of a Human Kiss",
+                    text: "Among the 116 images and sounds on the record, there's a recording of a human kiss—a small but profound message of love.",
                     icon: "fas fa-shield-alt"
                 },
                 {
-                    title: "Interstellar GPS",
-                    text: "Never get lost in space with our pulsar-based navigation system. It tracks thousands of pulsars across the galaxy for pinpoint accuracy anywhere in the Milky Way.",
+                    title: " NASA Hacked It to Keep It Alive",
+                    text: "Voyager 1 wasn't designed to last this long. NASA engineers have reprogrammed it remotely multiple times, even using tricks that weren't originally planned to keep it running!",
                     icon: "fas fa-compass"
                 }
             ];
@@ -1500,11 +2046,294 @@
             const orderForm = document.getElementById('orderForm');
             orderForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                showNotification('Order received! Our team will contact you shortly.', 'fas fa-paper-plane');
+                
+                // Get form values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const address = document.getElementById('address').value;
+                const model = document.getElementById('model').value;
+                const notes = document.getElementById('notes').value;
+                
+                // Create email body
+                const subject = `New Order for Voyager: ${model}`;
+                const body = `
+                    New Order Details:
+                    -----------------
+                    Name: ${name}
+                    Email: ${email}
+                    Address: ${address}
+                    Model: ${model}
+                    Special Requirements: ${notes || 'None'}
+                `;
+                
+                // Send email using mailto link
+                const mailtoLink = `mailto:ayush99know@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+                
+                // Show confirmation
+                showNotification('Order details opened in your email client. Please send to complete your order.', 'fas fa-paper-plane');
                 orderForm.reset();
             });
 
-            // Space Game Implementation
+            // Gallery Lightbox Functionality
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.querySelector('.lightbox-image');
+            const lightboxTitle = document.querySelector('.lightbox-title');
+            const lightboxDesc = document.querySelector('.lightbox-description');
+            const closeBtn = document.querySelector('.close-btn');
+            
+            document.querySelectorAll('.view-more-btn').forEach((btn, index) => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const galleryItem = btn.closest('.gallery-item');
+                    const imgSrc = galleryItem.querySelector('img').src;
+                    const title = galleryItem.querySelector('h3').textContent;
+                    const desc = galleryItem.querySelector('p').textContent;
+                    
+                    lightboxImg.src = imgSrc;
+                    lightboxTitle.textContent = title;
+                    lightboxDesc.textContent = desc;
+                    
+                    lightbox.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            // Close lightbox
+            closeBtn.addEventListener('click', () => {
+                lightbox.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+            
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    lightbox.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Keyboard navigation for lightbox
+            document.addEventListener('keydown', (e) => {
+                if (lightbox.classList.contains('show')) {
+                    if (e.key === 'Escape') {
+                        lightbox.classList.remove('show');
+                        document.body.style.overflow = '';
+                    }
+                }
+            });
+            
+            // Enhanced 3D effect for gallery items on mouse move
+            document.querySelector('.space-gallery').addEventListener('mousemove', (e) => {
+                const galleryItems = document.querySelectorAll('.gallery-item-inner');
+                const containerRect = e.currentTarget.getBoundingClientRect();
+                const centerX = containerRect.left + containerRect.width / 2;
+                const centerY = containerRect.top + containerRect.height / 2;
+                
+                galleryItems.forEach(item => {
+                    const itemRect = item.getBoundingClientRect();
+                    const itemCenterX = itemRect.left + itemRect.width / 2;
+                    const itemCenterY = itemRect.top + itemRect.height / 2;
+                    
+                    // Calculate distance from mouse to item center
+                    const deltaX = e.clientX - itemCenterX;
+                    const deltaY = e.clientY - itemCenterY;
+                    
+                    // Calculate rotation based on distance
+                    const rotateY = deltaX / 20;
+                    const rotateX = -deltaY / 20;
+                    
+                    // Calculate scale based on distance from container center
+                    const distanceFromCenter = Math.sqrt(
+                        Math.pow(itemCenterX - centerX, 2) + 
+                        Math.pow(itemCenterY - centerY, 2)
+                    );
+                    const maxDistance = Math.sqrt(
+                        Math.pow(containerRect.width / 2, 2) + 
+                        Math.pow(containerRect.height / 2, 2)
+                    );
+                    const scale = 1 + (0.05 * (1 - distanceFromCenter / maxDistance));
+                    
+                    item.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+                });
+            });
+            
+            // Reset transform when mouse leaves gallery
+            document.querySelector('.space-gallery').addEventListener('mouseleave', () => {
+                const galleryItems = document.querySelectorAll('.gallery-item-inner');
+                galleryItems.forEach(item => {
+                    item.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+                });
+            });
+
+            // Product Image Lightbox Functionality
+            const productLightbox = document.getElementById('productLightbox');
+            const productCloseBtn = document.getElementById('productCloseBtn');
+            const productSlider = document.getElementById('productSlider');
+            const productPrevBtn = document.getElementById('productPrevBtn');
+            const productNextBtn = document.getElementById('productNextBtn');
+            const productIndicators = document.getElementById('productIndicators');
+            
+            // Product images data - using your local images
+            const productImages = [
+                {
+                    src: 'image/product.jpg',
+                    title: 'Sound of Earth - Front View',
+                    description: 'The sleek plastic body with a stunning golden disk design'
+                },
+                {
+                    src: 'image/product2.jpg',
+                    title: 'Image 1',
+                    description: ''
+                },
+                {
+                    src: 'image/product3.jpg',
+                    title: 'Image 2',
+                    description: ''
+                },
+                {
+                    src: 'image/product4.jpg',
+                    title: 'Image 3',
+                    description: ''
+                },
+                {
+                    src: 'image/product5.jpg',
+                    title: 'Image 4',
+                    description: ''
+                },
+                {
+                    src: 'image/product6.jpg',
+                    title: 'Image 5',
+                    description: ''
+                }
+            ];
+            
+            let currentSlide = 0;
+            
+            // Initialize product lightbox slides
+            function initProductLightbox() {
+                productSlider.innerHTML = '';
+                productIndicators.innerHTML = '';
+                
+                productImages.forEach((image, index) => {
+                    // Create slide
+                    const slide = document.createElement('div');
+                    slide.className = 'product-lightbox-slide';
+                    slide.innerHTML = `
+                        <img src="${image.src}" alt="${image.title}" class="product-lightbox-image">
+                        <div class="product-lightbox-caption">
+                            <h3 class="product-lightbox-title">${image.title}</h3>
+                            <p class="product-lightbox-description">${image.description}</p>
+                        </div>
+                    `;
+                    productSlider.appendChild(slide);
+                    
+                    // Create indicator
+                    const indicator = document.createElement('div');
+                    indicator.className = 'product-lightbox-indicator';
+                    if (index === 0) indicator.classList.add('active');
+                    indicator.addEventListener('click', () => goToSlide(index));
+                    productIndicators.appendChild(indicator);
+                });
+                
+                updateSliderPosition();
+            }
+            
+            // Open product lightbox
+            document.getElementById('productImage').addEventListener('click', () => {
+                initProductLightbox();
+                productLightbox.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Close product lightbox
+            productCloseBtn.addEventListener('click', () => {
+                productLightbox.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+            
+            // Close when clicking outside content
+            productLightbox.addEventListener('click', (e) => {
+                if (e.target === productLightbox) {
+                    productLightbox.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (productLightbox.classList.contains('show')) {
+                    if (e.key === 'Escape') {
+                        productLightbox.classList.remove('show');
+                        document.body.style.overflow = '';
+                    } else if (e.key === 'ArrowLeft') {
+                        prevSlide();
+                    } else if (e.key === 'ArrowRight') {
+                        nextSlide();
+                    }
+                }
+            });
+            
+            // Navigation buttons
+            productPrevBtn.addEventListener('click', prevSlide);
+            productNextBtn.addEventListener('click', nextSlide);
+            
+            // Slide functions
+            function goToSlide(index) {
+                currentSlide = index;
+                updateSliderPosition();
+                updateIndicators();
+            }
+            
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + productImages.length) % productImages.length;
+                updateSliderPosition();
+                updateIndicators();
+            }
+            
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % productImages.length;
+                updateSliderPosition();
+                updateIndicators();
+            }
+            
+            function updateSliderPosition() {
+                productSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+            
+            function updateIndicators() {
+                const indicators = document.querySelectorAll('.product-lightbox-indicator');
+                indicators.forEach((indicator, index) => {
+                    if (index === currentSlide) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Swipe functionality for touch devices
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            productSlider.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+            
+            productSlider.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+            
+            function handleSwipe() {
+                const threshold = 50;
+                if (touchEndX < touchStartX - threshold) {
+                    nextSlide();
+                } else if (touchEndX > touchStartX + threshold) {
+                    prevSlide();
+                }
+            }
+
+            // Enhanced Space Game Implementation
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             const gameScore = document.getElementById('gameScore');
@@ -1518,43 +2347,51 @@
                 y: canvas.height - 60,
                 width: 40,
                 height: 40,
-                speed: 5
+                speed: 5,
+                isAlive: true
             };
 
             const lasers = [];
-            const stars = [];
+            const aliens = [];
             const asteroids = [];
             let score = 0;
             let gameRunning = false;
             let keys = {};
             let animationId;
+            let lastAlienSpawn = 0;
+            let lastAsteroidSpawn = 0;
+            let gameTime = 0;
+            let difficulty = 1;
 
             // Load images
             const shipImg = new Image();
             shipImg.src = 'https://www.freeiconspng.com/uploads/spaceship-png-2.png';
-            shipImg.onload = () => {
-                if (gameRunning) drawShip();
-            };
 
-            const starImg = new Image();
-            starImg.src = 'https://www.freeiconspng.com/uploads/star-png-19.png';
+            const alienImg = new Image();
+            alienImg.src = 'https://www.freeiconspng.com/uploads/alien-png-1.png';
 
             const asteroidImg = new Image();
             asteroidImg.src = 'https://www.freeiconspng.com/uploads/asteroid-png-5.png';
+
+            const explosionImg = new Image();
+            explosionImg.src = 'https://www.freeiconspng.com/uploads/explosion-png-4.png';
 
             // Initialize game
             function initGame() {
                 // Reset game state
                 lasers.length = 0;
-                stars.length = 0;
+                aliens.length = 0;
                 asteroids.length = 0;
                 score = 0;
+                gameTime = 0;
+                difficulty = 1;
                 gameScore.textContent = `Score: ${score}`;
                 finalScore.textContent = `Score: ${score}`;
                 
-                // Reset ship position
+                // Reset ship position and state
                 ship.x = canvas.width / 2;
                 ship.y = canvas.height - 60;
+                ship.isAlive = true;
                 
                 // Clear keys
                 keys = {};
@@ -1572,13 +2409,13 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === ' ' && gameRunning) {
                     fireLaser();
-                } else if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                } else if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
                     keys[e.key] = true;
                 }
             });
 
             document.addEventListener('keyup', function(e) {
-                if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
                     keys[e.key] = false;
                 }
             });
@@ -1588,15 +2425,11 @@
             document.getElementById('leftBtn').addEventListener('mouseup', () => keys['ArrowLeft'] = false);
             document.getElementById('rightBtn').addEventListener('mousedown', () => keys['ArrowRight'] = true);
             document.getElementById('rightBtn').addEventListener('mouseup', () => keys['ArrowRight'] = false);
-            document.getElementById('upBtn').addEventListener('mousedown', () => keys['ArrowUp'] = true);
-            document.getElementById('upBtn').addEventListener('mouseup', () => keys['ArrowUp'] = false);
-            document.getElementById('downBtn').addEventListener('mousedown', () => keys['ArrowDown'] = true);
-            document.getElementById('downBtn').addEventListener('mouseup', () => keys['ArrowDown'] = false);
             document.getElementById('fireBtn').addEventListener('click', fireLaser);
 
             // Fire laser
             function fireLaser() {
-                if (!gameRunning) return;
+                if (!gameRunning || !ship.isAlive) return;
                 
                 lasers.push({
                     x: ship.x + ship.width / 2 - 2.5,
@@ -1606,6 +2439,51 @@
                     speed: 7,
                     color: '#ff5555'
                 });
+                
+                // Play laser sound
+                playSound('laser');
+            }
+
+            // Play sound effects
+            function playSound(type) {
+                const sounds = {
+                    laser: {
+                        frequency: 220,
+                        type: 'square',
+                        duration: 0.1
+                    },
+                    explosion: {
+                        frequency: 100,
+                        type: 'sawtooth',
+                        duration: 0.3
+                    },
+                    alienHit: {
+                        frequency: 440,
+                        type: 'sine',
+                        duration: 0.2
+                    }
+                };
+                
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.type = sounds[type].type;
+                    oscillator.frequency.value = sounds[type].frequency;
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    gainNode.gain.exponentialRampToValueAtTime(
+                        0.0001, 
+                        audioCtx.currentTime + sounds[type].duration
+                    );
+                    
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + sounds[type].duration);
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
             }
 
             // Main game loop
@@ -1616,40 +2494,48 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 // Draw space background
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw background stars
-                for (let i = 0; i < 100; i++) {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()})`;
-                    ctx.fillRect(
-                        Math.random() * canvas.width,
-                        Math.random() * canvas.height,
-                        Math.random() * 2,
-                        Math.random() * 2
-                    );
-                }
+                drawSpaceBackground();
                 
                 // Update game state
                 updateGame();
                 
                 // Draw game elements
                 drawLasers();
-                drawStars();
+                drawAliens();
                 drawAsteroids();
-                drawShip();
+                if (ship.isAlive) drawShip();
                 
                 // Continue game loop
                 animationId = requestAnimationFrame(gameLoop);
             }
 
+            // Draw space background with stars
+            function drawSpaceBackground() {
+                // Draw black background
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw stars
+                for (let i = 0; i < 100; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = (Math.random() * canvas.height + (window.scrollY * 0.2)) % canvas.height;
+                    const size = Math.random() * 2;
+                    const opacity = Math.random();
+                    
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                    ctx.fillRect(x, y, size, size);
+                }
+            }
+
             // Update game state
             function updateGame() {
+                // Increase difficulty over time
+                gameTime++;
+                difficulty = 1 + Math.floor(gameTime / 1000);
+                
                 // Move ship
                 if (keys['ArrowLeft'] && ship.x > 0) ship.x -= ship.speed;
                 if (keys['ArrowRight'] && ship.x < canvas.width - ship.width) ship.x += ship.speed;
-                if (keys['ArrowUp'] && ship.y > 0) ship.y -= ship.speed;
-                if (keys['ArrowDown'] && ship.y < canvas.height - ship.height) ship.y += ship.speed;
                 
                 // Move lasers
                 for (let i = lasers.length - 1; i >= 0; i--) {
@@ -1657,55 +2543,71 @@
                     if (lasers[i].y < 0) lasers.splice(i, 1);
                 }
                 
-                // Move stars and check collisions
-                for (let i = stars.length - 1; i >= 0; i--) {
-                    stars[i].y += stars[i].speed;
-                    
-                    if (stars[i].y > canvas.height) {
-                        stars.splice(i, 1);
-                    } else if (checkCollision(ship, stars[i])) {
-                        score += 10;
-                        gameScore.textContent = `Score: ${score}`;
-                        stars.splice(i, 1);
-                    }
+                // Spawn aliens
+                if (Date.now() - lastAlienSpawn > 2000 / difficulty) {
+                    spawnAlien();
+                    lastAlienSpawn = Date.now();
                 }
                 
-                // Move asteroids and check collisions
-                for (let i = asteroids.length - 1; i >= 0; i--) {
-                    asteroids[i].y += asteroids[i].speed;
+                // Move aliens and check collisions
+                for (let i = aliens.length - 1; i >= 0; i--) {
+                    aliens[i].y += aliens[i].speed;
                     
-                    if (asteroids[i].y > canvas.height) {
-                        asteroids.splice(i, 1);
-                    } else if (checkCollision(ship, asteroids[i])) {
-                        endGame();
-                        return;
+                    if (aliens[i].y > canvas.height) {
+                        aliens.splice(i, 1);
+                    } else if (ship.isAlive && checkCollision(ship, aliens[i])) {
+                        ship.isAlive = false;
+                        playSound('explosion');
+                        setTimeout(endGame, 1000);
                     }
                     
-                    // Check laser-asteroid collisions
+                    // Check laser-alien collisions
                     for (let j = lasers.length - 1; j >= 0; j--) {
-                        if (checkCollision(lasers[j], asteroids[i])) {
+                        if (checkCollision(lasers[j], aliens[i])) {
                             score += 20;
                             gameScore.textContent = `Score: ${score}`;
-                            asteroids.splice(i, 1);
+                            aliens.splice(i, 1);
                             lasers.splice(j, 1);
+                            playSound('alienHit');
                             break;
                         }
                     }
                 }
                 
-                // Spawn new elements
-                if (Math.random() < 0.02) spawnStar();
-                if (Math.random() < 0.01) spawnAsteroid();
+                // Spawn asteroids
+                if (Date.now() - lastAsteroidSpawn > 3000 / difficulty) {
+                    spawnAsteroid();
+                    lastAsteroidSpawn = Date.now();
+                }
+                
+                // Move asteroids and check collisions
+                for (let i = asteroids.length - 1; i >= 0; i--) {
+                    asteroids[i].y += asteroids[i].speed;
+                    asteroids[i].x += asteroids[i].xSpeed;
+                    
+                    // Bounce off walls
+                    if (asteroids[i].x <= 0 || asteroids[i].x + asteroids[i].width >= canvas.width) {
+                        asteroids[i].xSpeed *= -1;
+                    }
+                    
+                    if (asteroids[i].y > canvas.height) {
+                        asteroids.splice(i, 1);
+                    } else if (ship.isAlive && checkCollision(ship, asteroids[i])) {
+                        ship.isAlive = false;
+                        playSound('explosion');
+                        setTimeout(endGame, 1000);
+                    }
+                }
             }
 
-            // Spawn a new star
-            function spawnStar() {
-                stars.push({
+            // Spawn a new alien
+            function spawnAlien() {
+                aliens.push({
                     x: Math.random() * (canvas.width - 30),
                     y: -30,
                     width: 30,
                     height: 30,
-                    speed: 3
+                    speed: 1 + Math.random() * difficulty
                 });
             }
 
@@ -1716,7 +2618,8 @@
                     y: -40,
                     width: 40,
                     height: 40,
-                    speed: 2 + Math.random() * 2
+                    speed: 1 + Math.random() * difficulty,
+                    xSpeed: (Math.random() - 0.5) * 2 * difficulty
                 });
             }
 
@@ -1738,21 +2641,44 @@
                 ctx.fillStyle = '#ff5555';
                 lasers.forEach(laser => {
                     ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
+                    
+                    // Add glow effect
+                    ctx.shadowColor = '#ff5555';
+                    ctx.shadowBlur = 10;
+                    ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
+                    ctx.shadowBlur = 0;
                 });
             }
 
-            // Draw stars
-            function drawStars() {
-                stars.forEach(star => {
-                    ctx.drawImage(starImg, star.x, star.y, star.width, star.height);
+            // Draw aliens
+            function drawAliens() {
+                aliens.forEach(alien => {
+                    ctx.drawImage(alienImg, alien.x, alien.y, alien.width, alien.height);
+                    
+                    // Add pulsing glow effect
+                    const pulse = Math.sin(Date.now() / 200) * 5 + 10;
+                    ctx.shadowColor = '#00ff00';
+                    ctx.shadowBlur = pulse;
+                    ctx.drawImage(alienImg, alien.x, alien.y, alien.width, alien.height);
+                    ctx.shadowBlur = 0;
                 });
             }
 
             // Draw asteroids
             function drawAsteroids() {
                 asteroids.forEach(asteroid => {
-                    ctx.drawImage(asteroidImg, asteroid.x, asteroid.y, asteroid.width, asteroid.height);
+                    // Rotate asteroids slightly
+                    ctx.save();
+                    ctx.translate(asteroid.x + asteroid.width/2, asteroid.y + asteroid.height/2);
+                    ctx.rotate(Date.now() / 1000 * asteroid.xSpeed);
+                    ctx.drawImage(asteroidImg, -asteroid.width/2, -asteroid.height/2, asteroid.width, asteroid.height);
+                    ctx.restore();
                 });
+            }
+
+            // Draw explosion
+            function drawExplosion(x, y) {
+                ctx.drawImage(explosionImg, x - 20, y - 20, 40, 40);
             }
 
             // End game
@@ -1762,10 +2688,49 @@
                 gameOverlay.style.display = 'flex';
                 document.querySelector('.game-over-text').textContent = 'Game Over';
                 finalScore.textContent = `Final Score: ${score}`;
+                
+                // Draw final explosion
+                if (!ship.isAlive) {
+                    drawExplosion(ship.x + ship.width/2, ship.y + ship.height/2);
+                }
             }
 
             // Initialize game overlay
             gameOverlay.style.display = 'flex';
+
+            // Terms Modal Functionality
+            const termsLink = document.getElementById('termsLink');
+            const termsModal = document.getElementById('termsModal');
+            const termsClose = document.getElementById('termsClose');
+
+            // Open terms modal
+            termsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                termsModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close terms modal
+            termsClose.addEventListener('click', () => {
+                termsModal.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+
+            // Close when clicking outside content
+            termsModal.addEventListener('click', (e) => {
+                if (e.target === termsModal) {
+                    termsModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (termsModal.classList.contains('show') && e.key === 'Escape') {
+                    termsModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
         });
     </script>
 </body>
