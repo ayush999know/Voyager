@@ -2736,12 +2736,34 @@
                 }
             });
 
-            // Button controls
-            document.getElementById('leftBtn').addEventListener('mousedown', () => keys['ArrowLeft'] = true);
-            document.getElementById('leftBtn').addEventListener('mouseup', () => keys['ArrowLeft'] = false);
-            document.getElementById('rightBtn').addEventListener('mousedown', () => keys['ArrowRight'] = true);
-            document.getElementById('rightBtn').addEventListener('mouseup', () => keys['ArrowRight'] = false);
-            document.getElementById('fireBtn').addEventListener('click', fireLaser);
+            // Button controls - FIXED THE ISSUE HERE
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            const fireBtn = document.getElementById('fireBtn');
+
+            leftBtn.addEventListener('mousedown', () => {
+                keys['ArrowLeft'] = true;
+                keys['ArrowRight'] = false;
+            });
+            leftBtn.addEventListener('mouseup', () => {
+                keys['ArrowLeft'] = false;
+            });
+            leftBtn.addEventListener('mouseleave', () => {
+                keys['ArrowLeft'] = false;
+            });
+
+            rightBtn.addEventListener('mousedown', () => {
+                keys['ArrowRight'] = true;
+                keys['ArrowLeft'] = false;
+            });
+            rightBtn.addEventListener('mouseup', () => {
+                keys['ArrowRight'] = false;
+            });
+            rightBtn.addEventListener('mouseleave', () => {
+                keys['ArrowRight'] = false;
+            });
+
+            fireBtn.addEventListener('click', fireLaser);
 
             // Fire laser
             function fireLaser() {
