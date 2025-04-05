@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novardent - Voyager | Space Exploration Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
     <style>
         /* Base Styles */
         * {
@@ -115,7 +122,7 @@
             opacity: 0.5;
         }
 
-        /* Header Styles */
+        /* Header Styles - MODIFIED */
         .space-header {
             position: fixed;
             width: 100%;
@@ -128,6 +135,11 @@
             border-bottom: 1px solid rgba(100, 149, 237, 0.3);
             z-index: 100;
             transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .space-header.hidden {
+            transform: translateY(-100%);
         }
 
         .space-header.scrolled {
@@ -135,10 +147,24 @@
             background: rgba(5, 5, 25, 0.9);
         }
 
+        .header-left {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .header-left::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
         .header-left nav ul {
-            display: flex;
+            display: inline-flex;
             list-style: none;
             gap: 25px;
+            padding-bottom: 10px; /* Space for scroll */
         }
 
         .nav-link {
@@ -164,23 +190,6 @@
         .nav-link:hover i {
             animation: iconRotate 0.5s ease;
             transform: scale(1.2);
-        }
-
-        .nav-link::after {
-            content: attr(data-text);
-            position: absolute;
-            left: 0;
-            top: 100%;
-            width: 100%;
-            text-align: center;
-            font-size: 0.7rem;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            opacity: 1;
-            transform: translateY(5px);
         }
 
         .logo {
@@ -1407,6 +1416,166 @@
             text-decoration: underline;
         }
 
+        /* Login Modal Styles */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .login-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .login-content {
+            background: linear-gradient(to bottom, #0f0c29, #302b63);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(100, 149, 237, 0.5);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            position: relative;
+            animation: modalFadeIn 0.5s ease;
+        }
+
+        .login-content h2 {
+            color: #a7c7e7;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(167, 199, 231, 0.5);
+        }
+
+        .login-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #a7c7e7;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(25, 25, 60, 0.5);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-close:hover {
+            color: #6495ed;
+            transform: rotate(90deg);
+        }
+
+        .login-signup {
+            text-align: center;
+            color: #ccc;
+            margin-top: 20px;
+        }
+
+        .login-signup a {
+            color: #6495ed;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-signup a:hover {
+            text-decoration: underline;
+        }
+
+        /* Forgot Password Modal */
+        .forgot-password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .forgot-password-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        /* Signup Modal Styles */
+        .signup-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .signup-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .signup-content {
+            background: linear-gradient(to bottom, #0f0c29, #302b63);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(100, 149, 237, 0.5);
+            border: 1px solid rgba(100, 149, 237, 0.3);
+            position: relative;
+            animation: modalFadeIn 0.5s ease;
+        }
+
+        .signup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #a7c7e7;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(25, 25, 60, 0.5);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .signup-close:hover {
+            color: #6495ed;
+            transform: rotate(90deg);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .space-header {
@@ -1416,8 +1585,7 @@
             }
             
             .header-left nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
+                gap: 15px;
             }
             
             .hero h1 {
@@ -1505,6 +1673,11 @@
             .terms-title {
                 font-size: 1.5rem;
             }
+
+            .login-content {
+                width: 95%;
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -1513,23 +1686,30 @@
     <div class="stars-container" id="starsContainer"></div>
     <div class="twinkling"></div>
     
+    <!-- MODIFIED HEADER -->
     <header class="space-header" id="header">
         <div class="header-left">
             <nav>
                 <ul>
-                    <li><a href="#home" class="nav-link" data-text="Home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="#product" class="nav-link" data-text="Product"><i class="fas fa-rocket"></i> Product</a></li>
-                    <li><a href="#gallery" class="nav-link" data-text="Gallery"><i class="fas fa-images"></i> Gallery</a></li>
-                    <li><a href="#facts" class="nav-link" data-text="Facts"><i class="fas fa-info-circle"></i> Facts</a></li>
-                    <li><a href="#game" class="nav-link" data-text="Game"><i class="fas fa-gamepad"></i> Game</a></li>
-                    <li><a href="#order" class="nav-link" data-text="Order"><i class="fas fa-shopping-cart"></i> Order</a></li>
-                    <li><a href="#" class="nav-link" data-text="Login"><i class="fas fa-user-astronaut"></i> Login</a></li>
-                    <li><a href="#" class="nav-link" data-text="Cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
-                    <li><a href="#" class="nav-link" data-text="Track"><i class="fas fa-rocket"></i> Track</a></li>
+                    <li><a href="#home" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#product" class="nav-link"><i class="fas fa-rocket"></i> Product</a></li>
+                    <li><a href="#game" class="nav-link"><i class="fas fa-gamepad"></i> Game</a></li>
+                    <li><a href="#order" class="nav-link"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li><a href="#" class="nav-link" id="loginLink"><i class="fas fa-user-astronaut"></i> Login</a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-rocket"></i> Track</a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-headset"></i> Support</a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-info-circle"></i> About</a></li>
                 </ul>
             </nav>
         </div>
         <div class="header-right">
+            <div id="userDisplay" style="display: none;">
+                <span id="usernameDisplay"></span>
+                <button id="logoutBtn" style="background: none; border: none; color: #a7c7e7; cursor: pointer; margin-left: 10px;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
             <h1 class="logo">Novardent</h1>
         </div>
     </header>
@@ -1775,9 +1955,10 @@
         </div>
         
         <p class="game-instructions">
-            Use arrow keys or buttons to move your spaceship. 
-            Shoot aliens (👽) for 20 points each. 
-            Dodge the moving asteroids (●) - they'll destroy your ship!
+            Control your rocket (▲) with left/right buttons or arrow keys. 
+            Shoot the green aliens (●) for points. 
+            Avoid contact with aliens - they'll destroy your ship!
+            Difficulty increases over time.
         </p>
     </section>
 
@@ -1875,10 +2056,95 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <span class="login-close" id="loginCloseBtn">&times;</span>
+            <h2>Novardent Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+            <p class="login-signup">
+                <a href="#" id="forgotPassword">Forgot password?</a> | 
+                New explorer? <a href="#" id="showSignup">Create account</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="login-modal" id="forgotPasswordModal">
+        <div class="login-content">
+            <span class="login-close" id="forgotPasswordCloseBtn">&times;</span>
+            <h2>Reset Password</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="resetEmail">Enter your email</label>
+                    <input type="email" id="resetEmail" required placeholder="your@email.com">
+                </div>
+                <button type="submit" class="submit-btn">Send Reset Link</button>
+            </form>
+            <p class="login-signup">
+                Remember your password? <a href="#" id="showLoginFromForgot">Sign in</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="login-modal" id="signupModal">
+        <div class="login-content">
+            <span class="login-close" id="signupCloseBtn">&times;</span>
+            <h2>Join the Space Mission</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Neil Armstrong">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+            <p class="login-signup">Already have an account? <a href="#" id="showLogin">Sign in</a></p>
+        </div>
+    </div>
+
     <div class="notification" id="notification"></div>
     
     <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRku1UOALGo2YrFLzzNDDe-01rwXu3J6s",
+            authDomain: "voyager-830be.firebaseapp.com",
+            projectId: "voyager-830be",
+            storageBucket: "voyager-830be.appspot.com",
+            messagingSenderId: "418486820827",
+            appId: "1:418486820827:web:eb21c1daae985c2c1891fe",
+            measurementId: "G-50HX42QEEW"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const analytics = firebase.analytics();
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Track page view
+            analytics.logEvent('page_view');
+            
             // Enhanced Star Background
             function createStars() {
                 const starsContainer = document.getElementById('starsContainer');
@@ -1930,14 +2196,33 @@
                 });
             });
 
-            // Header scroll effect
+            // MODIFIED HEADER SCROLL BEHAVIOR
             const header = document.getElementById('header');
+            let lastScroll = 0;
+            
             window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
+                const currentScroll = window.scrollY;
+                
+                // Scrolled down
+                if (currentScroll > lastScroll && currentScroll > 100) {
+                    header.classList.add('hidden');
+                } 
+                // Scrolled up
+                else if (currentScroll < lastScroll) {
+                    header.classList.remove('hidden');
                 }
+                
+                // Scrolled to top
+                if (currentScroll <= 0) {
+                    header.classList.remove('hidden');
+                    header.classList.remove('scrolled');
+                } 
+                // Scrolled down a bit
+                else if (currentScroll > 50) {
+                    header.classList.add('scrolled');
+                }
+                
+                lastScroll = currentScroll;
             });
 
             // Smooth scrolling for navigation links
@@ -1982,6 +2267,15 @@
             addToCartBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 showNotification('Voyager added to your cart!', 'fas fa-shopping-cart');
+                
+                // Track add to cart event
+                analytics.logEvent('add_to_cart', {
+                    items: [{
+                        item_name: 'Sound of Earth',
+                        price: 5000,
+                        currency: 'INR'
+                    }]
+                });
                 
                 // Cart icon animation
                 const cartIcon = addToCartBtn.querySelector('i');
@@ -2053,6 +2347,40 @@
                 const address = document.getElementById('address').value;
                 const model = document.getElementById('model').value;
                 const notes = document.getElementById('notes').value;
+                
+                // Track purchase event
+                analytics.logEvent('purchase', {
+                    currency: 'INR',
+                    value: 5000,
+                    items: [{
+                        item_name: model,
+                        price: 5000,
+                        quantity: 1
+                    }],
+                    user_data: {
+                        email: email,
+                        name: name
+                    }
+                });
+                
+                // Save order to Firestore if user is logged in
+                if (auth.currentUser) {
+                    db.collection('orders').add({
+                        userId: auth.currentUser.uid,
+                        name: name,
+                        email: email,
+                        address: address,
+                        model: model,
+                        notes: notes,
+                        amount: 5000,
+                        status: 'pending',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        showNotification('Order placed successfully!', 'fas fa-check-circle');
+                    }).catch((error) => {
+                        showNotification('Error saving order: ' + error.message, 'fas fa-exclamation-circle');
+                    });
+                }
                 
                 // Create email body
                 const subject = `New Order for Voyager: ${model}`;
@@ -2333,7 +2661,7 @@
                 }
             }
 
-            // Enhanced Space Game Implementation
+            // Space Game Implementation
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             const gameScore = document.getElementById('gameScore');
@@ -2345,46 +2673,34 @@
             const ship = {
                 x: canvas.width / 2,
                 y: canvas.height - 60,
-                width: 40,
+                width: 30,
                 height: 40,
-                speed: 5,
+                speed: 7,
                 isAlive: true
             };
 
             const lasers = [];
             const aliens = [];
-            const asteroids = [];
             let score = 0;
             let gameRunning = false;
             let keys = {};
             let animationId;
             let lastAlienSpawn = 0;
-            let lastAsteroidSpawn = 0;
             let gameTime = 0;
             let difficulty = 1;
-
-            // Load images
-            const shipImg = new Image();
-            shipImg.src = 'https://www.freeiconspng.com/uploads/spaceship-png-2.png';
-
-            const alienImg = new Image();
-            alienImg.src = 'https://www.freeiconspng.com/uploads/alien-png-1.png';
-
-            const asteroidImg = new Image();
-            asteroidImg.src = 'https://www.freeiconspng.com/uploads/asteroid-png-5.png';
-
-            const explosionImg = new Image();
-            explosionImg.src = 'https://www.freeiconspng.com/uploads/explosion-png-4.png';
+            let alienSpeed = 1;
+            let alienSpawnRate = 2000;
 
             // Initialize game
             function initGame() {
                 // Reset game state
                 lasers.length = 0;
                 aliens.length = 0;
-                asteroids.length = 0;
                 score = 0;
                 gameTime = 0;
                 difficulty = 1;
+                alienSpeed = 1;
+                alienSpawnRate = 2000;
                 gameScore.textContent = `Score: ${score}`;
                 finalScore.textContent = `Score: ${score}`;
                 
@@ -2436,54 +2752,9 @@
                     y: ship.y,
                     width: 5,
                     height: 15,
-                    speed: 7,
+                    speed: 10,
                     color: '#ff5555'
                 });
-                
-                // Play laser sound
-                playSound('laser');
-            }
-
-            // Play sound effects
-            function playSound(type) {
-                const sounds = {
-                    laser: {
-                        frequency: 220,
-                        type: 'square',
-                        duration: 0.1
-                    },
-                    explosion: {
-                        frequency: 100,
-                        type: 'sawtooth',
-                        duration: 0.3
-                    },
-                    alienHit: {
-                        frequency: 440,
-                        type: 'sine',
-                        duration: 0.2
-                    }
-                };
-                
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    
-                    oscillator.type = sounds[type].type;
-                    oscillator.frequency.value = sounds[type].frequency;
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    gainNode.gain.exponentialRampToValueAtTime(
-                        0.0001, 
-                        audioCtx.currentTime + sounds[type].duration
-                    );
-                    
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + sounds[type].duration);
-                } catch (e) {
-                    console.log('Audio not supported');
-                }
             }
 
             // Main game loop
@@ -2502,7 +2773,6 @@
                 // Draw game elements
                 drawLasers();
                 drawAliens();
-                drawAsteroids();
                 if (ship.isAlive) drawShip();
                 
                 // Continue game loop
@@ -2531,7 +2801,11 @@
             function updateGame() {
                 // Increase difficulty over time
                 gameTime++;
-                difficulty = 1 + Math.floor(gameTime / 1000);
+                if (gameTime % 1000 === 0) {
+                    difficulty += 0.5;
+                    alienSpeed = 1 + difficulty * 0.5;
+                    alienSpawnRate = Math.max(500, 2000 - difficulty * 200);
+                }
                 
                 // Move ship
                 if (keys['ArrowLeft'] && ship.x > 0) ship.x -= ship.speed;
@@ -2544,7 +2818,7 @@
                 }
                 
                 // Spawn aliens
-                if (Date.now() - lastAlienSpawn > 2000 / difficulty) {
+                if (Date.now() - lastAlienSpawn > alienSpawnRate) {
                     spawnAlien();
                     lastAlienSpawn = Date.now();
                 }
@@ -2557,7 +2831,6 @@
                         aliens.splice(i, 1);
                     } else if (ship.isAlive && checkCollision(ship, aliens[i])) {
                         ship.isAlive = false;
-                        playSound('explosion');
                         setTimeout(endGame, 1000);
                     }
                     
@@ -2568,34 +2841,8 @@
                             gameScore.textContent = `Score: ${score}`;
                             aliens.splice(i, 1);
                             lasers.splice(j, 1);
-                            playSound('alienHit');
                             break;
                         }
-                    }
-                }
-                
-                // Spawn asteroids
-                if (Date.now() - lastAsteroidSpawn > 3000 / difficulty) {
-                    spawnAsteroid();
-                    lastAsteroidSpawn = Date.now();
-                }
-                
-                // Move asteroids and check collisions
-                for (let i = asteroids.length - 1; i >= 0; i--) {
-                    asteroids[i].y += asteroids[i].speed;
-                    asteroids[i].x += asteroids[i].xSpeed;
-                    
-                    // Bounce off walls
-                    if (asteroids[i].x <= 0 || asteroids[i].x + asteroids[i].width >= canvas.width) {
-                        asteroids[i].xSpeed *= -1;
-                    }
-                    
-                    if (asteroids[i].y > canvas.height) {
-                        asteroids.splice(i, 1);
-                    } else if (ship.isAlive && checkCollision(ship, asteroids[i])) {
-                        ship.isAlive = false;
-                        playSound('explosion');
-                        setTimeout(endGame, 1000);
                     }
                 }
             }
@@ -2607,19 +2854,7 @@
                     y: -30,
                     width: 30,
                     height: 30,
-                    speed: 1 + Math.random() * difficulty
-                });
-            }
-
-            // Spawn a new asteroid
-            function spawnAsteroid() {
-                asteroids.push({
-                    x: Math.random() * (canvas.width - 40),
-                    y: -40,
-                    width: 40,
-                    height: 40,
-                    speed: 1 + Math.random() * difficulty,
-                    xSpeed: (Math.random() - 0.5) * 2 * difficulty
+                    speed: alienSpeed
                 });
             }
 
@@ -2631,9 +2866,15 @@
                        obj1.y + obj1.height > obj2.y;
             }
 
-            // Draw ship
+            // Draw ship (triangle)
             function drawShip() {
-                ctx.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
+                ctx.fillStyle = '#6495ed';
+                ctx.beginPath();
+                ctx.moveTo(ship.x + ship.width/2, ship.y);
+                ctx.lineTo(ship.x, ship.y + ship.height);
+                ctx.lineTo(ship.x + ship.width, ship.y + ship.height);
+                ctx.closePath();
+                ctx.fill();
             }
 
             // Draw lasers
@@ -2650,35 +2891,21 @@
                 });
             }
 
-            // Draw aliens
+            // Draw aliens (green circles)
             function drawAliens() {
                 aliens.forEach(alien => {
-                    ctx.drawImage(alienImg, alien.x, alien.y, alien.width, alien.height);
+                    ctx.fillStyle = '#00ff00';
+                    ctx.beginPath();
+                    ctx.arc(alien.x + alien.width/2, alien.y + alien.height/2, alien.width/2, 0, Math.PI * 2);
+                    ctx.fill();
                     
                     // Add pulsing glow effect
                     const pulse = Math.sin(Date.now() / 200) * 5 + 10;
                     ctx.shadowColor = '#00ff00';
                     ctx.shadowBlur = pulse;
-                    ctx.drawImage(alienImg, alien.x, alien.y, alien.width, alien.height);
+                    ctx.fill();
                     ctx.shadowBlur = 0;
                 });
-            }
-
-            // Draw asteroids
-            function drawAsteroids() {
-                asteroids.forEach(asteroid => {
-                    // Rotate asteroids slightly
-                    ctx.save();
-                    ctx.translate(asteroid.x + asteroid.width/2, asteroid.y + asteroid.height/2);
-                    ctx.rotate(Date.now() / 1000 * asteroid.xSpeed);
-                    ctx.drawImage(asteroidImg, -asteroid.width/2, -asteroid.height/2, asteroid.width, asteroid.height);
-                    ctx.restore();
-                });
-            }
-
-            // Draw explosion
-            function drawExplosion(x, y) {
-                ctx.drawImage(explosionImg, x - 20, y - 20, 40, 40);
             }
 
             // End game
@@ -2688,11 +2915,6 @@
                 gameOverlay.style.display = 'flex';
                 document.querySelector('.game-over-text').textContent = 'Game Over';
                 finalScore.textContent = `Final Score: ${score}`;
-                
-                // Draw final explosion
-                if (!ship.isAlive) {
-                    drawExplosion(ship.x + ship.width/2, ship.y + ship.height/2);
-                }
             }
 
             // Initialize game overlay
@@ -2728,6 +2950,195 @@
             document.addEventListener('keydown', (e) => {
                 if (termsModal.classList.contains('show') && e.key === 'Escape') {
                     termsModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Login System with Firebase
+            const loginLink = document.getElementById('loginLink');
+            const loginModal = document.getElementById('loginModal');
+            const loginCloseBtn = document.getElementById('loginCloseBtn');
+            const loginForm = document.getElementById('loginForm');
+            const signupModal = document.getElementById('signupModal');
+            const signupCloseBtn = document.getElementById('signupCloseBtn');
+            const signupForm = document.getElementById('signupForm');
+            const showSignup = document.getElementById('showSignup');
+            const showLogin = document.getElementById('showLogin');
+            const userDisplay = document.getElementById('userDisplay');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const forgotPasswordLink = document.getElementById('forgotPassword');
+            const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+            const forgotPasswordCloseBtn = document.getElementById('forgotPasswordCloseBtn');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            const showLoginFromForgot = document.getElementById('showLoginFromForgot');
+
+            // Check if user is logged in on page load
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    showUserDisplay(user.displayName || user.email.split('@')[0]);
+                    analytics.logEvent('login', { method: 'auto' });
+                } else {
+                    userDisplay.style.display = 'none';
+                }
+            });
+
+            // Open login modal
+            loginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (auth.currentUser) {
+                    showNotification(`Welcome back, ${auth.currentUser.displayName || auth.currentUser.email.split('@')[0]}!`, 'fas fa-user-astronaut');
+                } else {
+                    loginModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+
+            // Close login modal
+            loginCloseBtn.addEventListener('click', function() {
+                loginModal.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+
+            // Open forgot password modal
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginModal.classList.remove('show');
+                forgotPasswordModal.classList.add('show');
+            });
+
+            // Close forgot password modal
+            forgotPasswordCloseBtn.addEventListener('click', function() {
+                forgotPasswordModal.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+
+            // Open login modal from forgot password
+            showLoginFromForgot.addEventListener('click', function(e) {
+                e.preventDefault();
+                forgotPasswordModal.classList.remove('show');
+                loginModal.classList.add('show');
+            });
+
+            // Handle password reset form submission
+            forgotPasswordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('resetEmail').value;
+                
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        showNotification('Password reset email sent! Check your inbox.', 'fas fa-envelope');
+                        forgotPasswordModal.classList.remove('show');
+                        document.body.style.overflow = '';
+                    })
+                    .catch((error) => {
+                        showNotification(error.message, 'fas fa-exclamation-circle');
+                    });
+            });
+
+            // Open signup modal from login
+            showSignup.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginModal.classList.remove('show');
+                signupModal.classList.add('show');
+            });
+
+            // Close signup modal
+            signupCloseBtn.addEventListener('click', function() {
+                signupModal.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+
+            // Open login modal from signup
+            showLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                signupModal.classList.remove('show');
+                loginModal.classList.add('show');
+            });
+
+            // Handle login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        analytics.logEvent('login', { method: 'email' });
+                        showUserDisplay(user.displayName || user.email.split('@')[0]);
+                        loginModal.classList.remove('show');
+                        document.body.style.overflow = '';
+                        showNotification(`Welcome to Novardent, ${user.displayName || user.email.split('@')[0]}!`, 'fas fa-user-astronaut');
+                    })
+                    .catch((error) => {
+                        showNotification(error.message, 'fas fa-exclamation-circle');
+                    });
+            });
+
+            // Handle signup form submission
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        analytics.logEvent('sign_up', { method: 'email' });
+                        
+                        // Update user profile with display name
+                        return user.updateProfile({
+                            displayName: name
+                        });
+                    })
+                    .then(() => {
+                        // Create user document in Firestore
+                        return db.collection('users').doc(auth.currentUser.uid).set({
+                            name: name,
+                            email: email,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    })
+                    .then(() => {
+                        showUserDisplay(name);
+                        signupModal.classList.remove('show');
+                        document.body.style.overflow = '';
+                        showNotification(`Welcome to Novardent, ${name}!`, 'fas fa-user-astronaut');
+                    })
+                    .catch((error) => {
+                        showNotification(error.message, 'fas fa-exclamation-circle');
+                    });
+            });
+
+            // Handle logout
+            logoutBtn.addEventListener('click', function() {
+                auth.signOut().then(() => {
+                    userDisplay.style.display = 'none';
+                    showNotification('Logged out successfully', 'fas fa-sign-out-alt');
+                    analytics.logEvent('logout');
+                });
+            });
+
+            // Show user display in header
+            function showUserDisplay(username) {
+                usernameDisplay.textContent = username;
+                userDisplay.style.display = 'flex';
+            }
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    loginModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+                if (e.target === signupModal) {
+                    signupModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+                if (e.target === forgotPasswordModal) {
+                    forgotPasswordModal.classList.remove('show');
                     document.body.style.overflow = '';
                 }
             });
