@@ -244,6 +244,35 @@
             to { transform: scale(1.1); }
         }
         
+        /* Memory Game */
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .memory-card {
+            width: 100px;
+            height: 100px;
+            background-color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+            background-color: white;
+        }
+        
         /* Birthday Wishes */
         .wishes-container {
             max-width: 600px;
@@ -278,6 +307,13 @@
             #gameCanvas {
                 width: 100%;
                 height: auto;
+            }
+            .memory-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .memory-card {
+                width: 80px;
+                height: 80px;
             }
         }
         
@@ -370,7 +406,7 @@
     
     <!-- Game Section -->
     <section id="game">
-        <h1>Dodge the Gifts! 🎁</h1>
+        <h1>Catch the Gifts! 🎁</h1>
         <div class="game-container">
             <canvas id="gameCanvas" width="500" height="400"></canvas>
             <div class="game-controls">
@@ -383,6 +419,14 @@
                 <p>Use ← and → keys to move</p>
             </div>
         </div>
+    </section>
+    
+    <!-- Memory Game -->
+    <section id="memory-game">
+        <h1>Memory Challenge</h1>
+        <p>Find all matching pairs to unlock a special message!</p>
+        <div class="memory-game" id="memoryGame"></div>
+        <div id="memoryMessage" style="display: none; margin-top: 20px; font-size: 1.5rem; color: var(--primary);"></div>
     </section>
     
     <!-- Quiz Section -->
@@ -784,6 +828,77 @@
         
         // Initialize canvas
         drawPlayer();
+        
+        // ======================
+        // MEMORY GAME
+        // ======================
+        
+        const memoryGame = document.getElementById('memoryGame');
+        const memoryMessage = document.getElementById('memoryMessage');
+        
+        const emojis = ['🎁', '🎂', '🎈', '🎉', '🍰', '🥳', '🎊', '🍭'];
+        let memoryCards = [...emojis, ...emojis];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        
+        // Shuffle cards
+        memoryCards.sort(() => Math.random() - 0.5);
+        
+        // Create memory game
+        function createMemoryGame() {
+            memoryGame.innerHTML = '';
+            
+            memoryCards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = index;
+                card.dataset.emoji = emoji;
+                card.addEventListener('click', flipCard);
+                memoryGame.appendChild(card);
+            });
+        }
+        
+        // Flip card
+        function flipCard() {
+            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
+                this.classList.add('flipped');
+                this.textContent = this.dataset.emoji;
+                flippedCards.push(this);
+                
+                if (flippedCards.length === 2) {
+                    checkForMatch();
+                }
+            }
+        }
+        
+        // Check for match
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                // Match found
+                matchedPairs++;
+                flippedCards = [];
+                
+                if (matchedPairs === emojis.length) {
+                    // Game completed
+                    memoryMessage.textContent = "You're a memory master! Happy Birthday! 🎉";
+                    memoryMessage.style.display = 'block';
+                    createConfetti();
+                }
+            } else {
+                // No match
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    card1.textContent = '';
+                    card2.textContent = '';
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+        
+        createMemoryGame();
         
         // ======================
         // QUIZ
