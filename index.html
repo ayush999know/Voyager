@@ -1,984 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday!</title>
-    <style>
-        /* General Styles */
-        :root {
-            --primary: #ff4081;
-            --secondary: #ff79b0;
-            --accent: #ffeb3b;
-            --dark: #c2185b;
-            --light: #ffebee;
-        }
-        
-        body {
-            font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light);
-            color: var(--dark);
-            text-align: center;
-            overflow-x: hidden;
-        }
-        
-        section {
-            padding: 50px 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        
-        h1, h2 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
-        }
-        
-        /* Confetti */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent);
-            opacity: 0.8;
-            z-index: 1000;
-            pointer-events: none;
-        }
-        
-        /* Countdown Timer Styles */
-        .countdown-container {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .countdown {
-            background-color: var(--secondary);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            width: 45%;
-            min-width: 250px;
-            transition: transform 0.3s;
-        }
-        
-        .countdown:hover {
-            transform: translateY(-5px);
-        }
-        
-        .countdown h3 {
-            margin-top: 0;
-            font-size: 1.5rem;
-        }
-        
-        .timer {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        .birthday-message {
-            font-size: 1.5rem;
-            color: var(--accent);
-            font-weight: bold;
-            height: 40px;
-            margin-top: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            animation: pulse 0.5s infinite alternate;
-        }
-        
-        /* Interactive Text Styles */
-        .interactive-text-container {
-            perspective: 1000px;
-        }
-        
-        .interactive-text {
-            font-size: 4rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-shadow: 3px 3px 0 #f8bbd0, 6px 6px 0 #f48fb1, 9px 9px 0 #f06292;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-block;
-            transform-style: preserve-3d;
-        }
-        
-        .interactive-text:hover {
-            transform: rotateY(20deg) scale(1.1);
-            text-shadow: 3px 3px 0 #f8bbd0, 6px 6px 0 #f48fb1, 9px 9px 0 #f06292, 12px 12px 0 #ec407a;
-        }
-        
-        /* Game Styles */
-        .game-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        
-        #gameCanvas {
-            background-color: #fce4ec;
-            border: 3px solid var(--secondary);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: block;
-            margin: 0 auto 20px;
-        }
-        
-        .game-controls {
-            margin-bottom: 20px;
-        }
-        
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 5px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        button:hover {
-            background-color: var(--dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .score-display {
-            font-size: 1.3rem;
-            margin-top: 15px;
-            background-color: var(--light);
-            padding: 10px 15px;
-            border-radius: 50px;
-            display: inline-block;
-        }
-        
-        /* Quiz Styles */
-        .quiz-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        
-        .question {
-            margin-bottom: 30px;
-            text-align: left;
-            background-color: var(--light);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .option {
-            background-color: white;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid var(--secondary);
-            font-weight: bold;
-        }
-        
-        .option:hover {
-            background-color: var(--secondary);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .celebration {
-            display: none;
-            margin-top: 30px;
-        }
-        
-        .dancing-people {
-            font-size: 3rem;
-            animation: dance 1s infinite alternate;
-        }
-        
-        @keyframes dance {
-            from { transform: translateY(0) rotate(0deg); }
-            to { transform: translateY(-20px) rotate(5deg); }
-        }
-        
-        .cake {
-            font-size: 4rem;
-            margin-top: 20px;
-            animation: pulse 0.5s infinite alternate;
-        }
-        
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
-        }
-        
-        /* Memory Game */
-        .memory-game {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 500px;
-            margin: 20px auto;
-        }
-        
-        .memory-card {
-            width: 100px;
-            height: 100px;
-            background-color: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            transform-style: preserve-3d;
-            position: relative;
-        }
-        
-        .memory-card.flipped {
-            transform: rotateY(180deg);
-            background-color: white;
-        }
-        
-        /* Birthday Wishes */
-        .wishes-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        
-        .wish {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: var(--light);
-            border-radius: 10px;
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .countdown {
-                width: 100%;
-            }
-            .interactive-text {
-                font-size: 2.5rem;
-            }
-            #gameCanvas {
-                width: 100%;
-                height: auto;
-            }
-            .memory-game {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .memory-card {
-                width: 80px;
-                height: 80px;
-            }
-        }
-        
-        /* Floating balloons */
-        .balloon {
-            position: absolute;
-            width: 50px;
-            height: 60px;
-            border-radius: 50%;
-            opacity: 0.8;
-            z-index: -1;
-            animation: float 10s infinite ease-in;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); }
-            100% { transform: translateY(-100vh) rotate(360deg); }
-        }
-        
-        /* Music Player */
-        .music-player {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: white;
-            padding: 10px;
-            border-radius: 50px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 100;
-        }
-        
-        .music-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Data Manager</title>
+  <style>
+    :root {
+      --primary-bg: #121212;
+      --card-bg: #1E1E1E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #BBBBBB;
+      --accent: #4CAF50;
+      --error: #FF4444;
+      --input-bg: #2D2D2D;
+      --border-radius: 8px;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #333;
+      border-radius: var(--border-radius);
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      box-sizing: border-box;
+      padding-right: 40px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #3e8e41;
+    }
+    
+    .toggle-icon {
+      position: absolute;
+      right: 12px;
+      top: 38px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    
+    .eye-icon {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    
+    .status-message {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      display: none;
+    }
+    
+    .success {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: var(--accent);
+      display: block;
+    }
+    
+    .error {
+      background-color: rgba(255, 68, 68, 0.2);
+      color: var(--error);
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <!-- Floating Balloons -->
-    <div id="balloons-container"></div>
-    
-    <!-- Music Player -->
-    <div class="music-player">
-        <button class="music-btn" id="musicToggle">🎵</button>
-        <audio id="birthdayMusic" loop>
-            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-        </audio>
+  <div class="container">
+    <h2>Add Location Data</h2>
+    <div class="card">
+      <form id="locationForm">
+        <div class="form-group">
+          <label for="lat">Latitude</label>
+          <input type="password" id="lat" placeholder="Enter latitude" autocomplete="off">
+          <span class="toggle-icon" onclick="togglePassword('lat')">
+            <svg class="eye-icon" viewBox="0 0 24 24">
+              <path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0z"/>
+            </svg>
+          </span>
+        </div>
+        
+        <div class="form-group">
+          <label for="lng">Longitude</label>
+          <input type="password" id="lng" placeholder="Enter longitude" autocomplete="off">
+          <span class="toggle-icon" onclick="togglePassword('lng')">
+            <svg class="eye-icon" viewBox="0 0 24 24">
+              <path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0z"/>
+            </svg>
+          </span>
+        </div>
+        
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Enter name">
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="text" id="phone" placeholder="Enter phone number">
+        </div>
+        
+        <div class="form-group">
+          <label for="upi">UPI ID</label>
+          <input type="text" id="upi" placeholder="Enter UPI ID">
+        </div>
+        
+        <button type="submit">Submit Location Data</button>
+      </form>
+      
+      <div id="statusMessage" class="status-message"></div>
     </div>
-    
-    <!-- Countdown Section -->
-    <section id="countdown">
-        <h1>Countdown to the Birthday!</h1>
-        <div class="countdown-container">
-            <div class="countdown">
-                <h3>India Time (IST) 🇮🇳</h3>
-                <div class="timer" id="indiaTimer">00:00:00:00</div>
-                <div class="birthday-message" id="indiaMessage"></div>
-            </div>
-            <div class="countdown">
-                <h3>California Time (PDT) 🇺🇸</h3>
-                <div class="timer" id="californiaTimer">00:00:00:00</div>
-                <div class="birthday-message" id="californiaMessage"></div>
-            </div>
-        </div>
-        <div style="margin-top: 30px;">
-            <p>Scroll down for birthday fun! 🎉</p>
-            <div style="font-size: 2rem;">👇</div>
-        </div>
-    </section>
-    
-    <!-- Interactive Text Section -->
-    <section id="interactive-text">
-        <div class="interactive-text-container">
-            <div class="interactive-text" id="birthdayText">Happy Birthday Dummy!</div>
-        </div>
-        <div style="margin-top: 30px;">
-            <button id="changeTextBtn">Change Message</button>
-            <button id="confettiBtn">Throw Confetti!</button>
-        </div>
-    </section>
-    
-    <!-- Game Section -->
-    <section id="game">
-        <h1>Catch the Gifts! 🎁</h1>
-        <div class="game-container">
-            <canvas id="gameCanvas" width="500" height="400"></canvas>
-            <div class="game-controls">
-                <button id="startBtn">Start Game</button>
-                <button id="resetBtn">Reset Game</button>
-                <div class="score-display">
-                    Score: <span id="score">0</span> | 
-                    High Score: <span id="highScore">0</span>
-                </div>
-                <p>Use ← and → keys to move</p>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Memory Game -->
-    <section id="memory-game">
-        <h1>Memory Challenge</h1>
-        <p>Find all matching pairs to unlock a special message!</p>
-        <div class="memory-game" id="memoryGame"></div>
-        <div id="memoryMessage" style="display: none; margin-top: 20px; font-size: 1.5rem; color: var(--primary);"></div>
-    </section>
-    
-    <!-- Quiz Section -->
-    <section id="quiz">
-        <h1>Unlock Your Birthday Present! 🎁</h1>
-        <div class="quiz-container">
-            <div class="question">
-                <p>1. Pix is a __?</p>
-                <div class="options">
-                    <div class="option" data-correct="true">a. Fat</div>
-                    <div class="option" data-correct="false">b. Cute</div>
-                    <div class="option" data-correct="false">c. Smart</div>
-                    <div class="option" data-correct="false">d. Adorable</div>
-                </div>
-            </div>
-            
-            <div class="question">
-                <p>2. Boys are __ than girls?</p>
-                <div class="options">
-                    <div class="option" data-correct="false">a. Not equal</div>
-                    <div class="option" data-correct="true">b. Better</div>
-                    <div class="option" data-correct="false">c. Not better</div>
-                    <div class="option" data-correct="false">d. Equal</div>
-                </div>
-            </div>
-            
-            <div class="celebration" id="celebration">
-                <div class="dancing-people">💃🕺👯‍♀️</div>
-                <div class="cake">🎂</div>
-                <h2>Happy Birthday! Here's your cake!</h2>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Birthday Wishes -->
-    <section id="wishes">
-        <h1>Birthday Wishes</h1>
-        <div class="wishes-container">
-            <div class="wish">
-                <h3>From your best friend</h3>
-                <p>Wishing you the happiest of birthdays! May your day be filled with joy, laughter, and lots of cake!</p>
-            </div>
-            <div class="wish">
-                <h3>From your family</h3>
-                <p>Another year wiser, another year more amazing! We're so proud of you!</p>
-            </div>
-            <button id="addWishBtn">Add Your Own Wish</button>
-        </div>
-    </section>
+  </div>
 
-    <script>
-        // ======================
-        // GENERAL FUNCTIONS
-        // ======================
-        
-        // Create floating balloons
-        function createBalloons() {
-            const colors = ['#ff4081', '#ff79b0', '#ffeb3b', '#4caf50', '#2196f3'];
-            const container = document.getElementById('balloons-container');
-            
-            for (let i = 0; i < 15; i++) {
-                const balloon = document.createElement('div');
-                balloon.className = 'balloon';
-                balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                balloon.style.left = `${Math.random() * 100}vw`;
-                balloon.style.animationDuration = `${10 + Math.random() * 20}s`;
-                balloon.style.animationDelay = `${Math.random() * 5}s`;
-                container.appendChild(balloon);
-            }
-        }
-        
-        // Create confetti
-        function createConfetti() {
-            const colors = ['#ff4081', '#ff79b0', '#ffeb3b', '#4caf50', '#2196f3'];
-            
-            for (let i = 0; i < 100; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.left = `${Math.random() * 100}vw`;
-                confetti.style.top = '-10px';
-                confetti.style.width = `${5 + Math.random() * 10}px`;
-                confetti.style.height = `${5 + Math.random() * 10}px`;
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                
-                document.body.appendChild(confetti);
-                
-                // Animation
-                const animationDuration = 3 + Math.random() * 5;
-                confetti.style.animation = `fall ${animationDuration}s linear forwards`;
-                
-                // Create keyframes for falling animation
-                const keyframes = `
-                    @keyframes fall {
-                        to {
-                            transform: translateY(100vh) rotate(${Math.random() * 360}deg);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                
-                // Add keyframes to head
-                const styleEl = document.createElement('style');
-                styleEl.innerHTML = keyframes;
-                document.head.appendChild(styleEl);
-                
-                // Remove confetti after animation
-                setTimeout(() => {
-                    confetti.remove();
-                    styleEl.remove();
-                }, animationDuration * 1000);
-            }
-        }
-        
-        // Music player
-        const musicToggle = document.getElementById('musicToggle');
-        const birthdayMusic = document.getElementById('birthdayMusic');
-        
-        musicToggle.addEventListener('click', () => {
-            if (birthdayMusic.paused) {
-                birthdayMusic.play();
-                musicToggle.textContent = '🔊';
-            } else {
-                birthdayMusic.pause();
-                musicToggle.textContent = '🎵';
-            }
-        });
-        
-        // ======================
-        // COUNTDOWN TIMER - FIXED VERSION
-        // ======================
-        
-        function updateCountdowns() {
-            // Current UTC time
-            const nowUTC = new Date();
-            
-            // India Time (IST is UTC+5:30)
-            const indiaBirthday = new Date('2025-05-28T00:00:00+05:30');
-            const diffIndia = indiaBirthday - nowUTC;
-            
-            // California Time (PDT is UTC-7:00)
-            const californiaBirthday = new Date('2025-05-28T00:00:00-07:00');
-            const diffCalifornia = californiaBirthday - nowUTC;
-            
-            // Format time
-            function formatTime(diff) {
-                if (diff <= 0) return "00:00:00:00";
-                
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            }
-            
-            // Update India Timer
-            document.getElementById('indiaTimer').textContent = formatTime(diffIndia);
-            document.getElementById('indiaMessage').textContent = diffIndia <= 0 ? "Happy Birthday from India! 🇮🇳" : "";
-            
-            // Update California Timer
-            document.getElementById('californiaTimer').textContent = formatTime(diffCalifornia);
-            document.getElementById('californiaMessage').textContent = diffCalifornia <= 0 ? "Happy Birthday from California! 🇺🇸" : "";
-        }
-        
-        setInterval(updateCountdowns, 1000);
-        updateCountdowns();
-        
-        // ======================
-        // INTERACTIVE TEXT
-        // ======================
-        
-        const birthdayText = document.getElementById('birthdayText');
-        const changeTextBtn = document.getElementById('changeTextBtn');
-        const confettiBtn = document.getElementById('confettiBtn');
-        
-        const messages = [
-            "Happy Birthday!",
-            "You're Awesome!",
-            "Best Wishes!",
-            "Party Time!",
-            "Let's Celebrate!",
-            "You're Amazing!",
-            "Have a Blast!"
-        ];
-        
-        changeTextBtn.addEventListener('click', () => {
-            const randomIndex = Math.floor(Math.random() * messages.length);
-            birthdayText.textContent = messages[randomIndex];
-            birthdayText.style.animation = 'none';
-            void birthdayText.offsetWidth; // Trigger reflow
-            birthdayText.style.animation = 'pulse 0.5s';
-        });
-        
-        confettiBtn.addEventListener('click', createConfetti);
-        
-        // ======================
-        // GIFT CATCHING GAME
-        // ======================
-        
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const scoreDisplay = document.getElementById('score');
-        const highScoreDisplay = document.getElementById('highScore');
-        
-        // Game variables
-        let gameRunning = false;
-        let score = 0;
-        let highScore = localStorage.getItem('highScore') || 0;
-        highScoreDisplay.textContent = highScore;
-        let scoreInterval;
-        let gameAnimationFrame;
-        
-        // Player
-        const player = {
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 60,
-            width: 50,
-            height: 50,
-            speed: 8,
-            dx: 0
-        };
-        
-        // Gifts
-        let gifts = [];
-        const giftImages = ['🎁', '🎀', '🎈', '🍫', '🍬', '🎮', '👑'];
-        let giftSpeed = 3;
-        let giftInterval;
-        
-        // Draw player (girl)
-        function drawPlayer() {
-            ctx.font = '40px Arial';
-            ctx.fillText('👧', player.x, player.y);
-        }
-        
-        // Draw gifts
-        function drawGifts() {
-            ctx.font = '30px Arial';
-            gifts.forEach(gift => {
-                ctx.fillText(gift.emoji, gift.x, gift.y);
-            });
-        }
-        
-        // Create new gift
-        function createGift() {
-            const emoji = giftImages[Math.floor(Math.random() * giftImages.length)];
-            const x = Math.random() * (canvas.width - 30);
-            const y = -30;
-            
-            gifts.push({ emoji, x, y });
-        }
-        
-        // Clear the canvas
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-        
-        // Update game state
-        function update() {
-            clearCanvas();
-            
-            // Update player position
-            player.x += player.dx;
-            
-            // Boundary check
-            if (player.x < 0) player.x = 0;
-            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
-            
-            // Update gifts
-            for (let i = gifts.length - 1; i >= 0; i--) {
-                gifts[i].y += giftSpeed;
-                
-                // Check collision
-                if (
-                    gifts[i].y + 30 > player.y &&
-                    gifts[i].x > player.x - 15 &&
-                    gifts[i].x < player.x + player.width
-                ) {
-                    // Game over
-                    gameOver();
-                    return;
-                }
-                
-                // Remove gifts that are out of screen
-                if (gifts[i].y > canvas.height) {
-                    gifts.splice(i, 1);
-                }
-            }
-            
-            drawPlayer();
-            drawGifts();
-            
-            if (gameRunning) {
-                gameAnimationFrame = requestAnimationFrame(update);
-            }
-        }
-        
-        // Score timer
-        function startScoreTimer() {
-            scoreInterval = setInterval(() => {
-                if (gameRunning) {
-                    score++;
-                    scoreDisplay.textContent = score;
-                    
-                    // Increase difficulty
-                    if (score % 5 === 0) {
-                        giftSpeed += 0.2;
-                    }
-                }
-            }, 10000); // Update every 10 seconds
-        }
-        
-        // Start game
-        function startGame() {
-            if (!gameRunning) {
-                // Reset game state
-                gameRunning = true;
-                score = 0;
-                scoreDisplay.textContent = score;
-                gifts = [];
-                giftSpeed = 3;
-                player.x = canvas.width / 2 - 25;
-                player.dx = 0;
-                
-                clearCanvas();
-                drawPlayer();
-                
-                // Create gifts at intervals
-                clearInterval(giftInterval);
-                giftInterval = setInterval(createGift, 1000);
-                
-                // Start score timer
-                clearInterval(scoreInterval);
-                startScoreTimer();
-                
-                // Start game loop
-                update();
-            }
-        }
-        
-        // Reset game
-        function resetGame() {
-            gameRunning = false;
-            clearInterval(giftInterval);
-            clearInterval(scoreInterval);
-            cancelAnimationFrame(gameAnimationFrame);
-            score = 0;
-            scoreDisplay.textContent = score;
-            gifts = [];
-            giftSpeed = 3;
-            clearCanvas();
-            drawPlayer();
-        }
-        
-        // Game over
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(giftInterval);
-            clearInterval(scoreInterval);
-            cancelAnimationFrame(gameAnimationFrame);
-            
-            // Show "Ayo" message
-            ctx.font = '30px Arial';
-            ctx.fillStyle = '#d81b60';
-            ctx.fillText('Ayo!', player.x, player.y - 10);
-            
-            // Update high score
-            if (score > highScore) {
-                highScore = score;
-                highScoreDisplay.textContent = highScore;
-                localStorage.setItem('highScore', highScore);
-            }
-            
-            // Create confetti
-            createConfetti();
-        }
-        
-        // Event listeners for game
-        startBtn.addEventListener('click', startGame);
-        resetBtn.addEventListener('click', resetGame);
-        
-        document.addEventListener('keydown', (e) => {
-            if (gameRunning) {
-                if (e.key === 'ArrowLeft') {
-                    player.dx = -player.speed;
-                } else if (e.key === 'ArrowRight') {
-                    player.dx = player.speed;
-                }
-            }
-        });
-        
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                player.dx = 0;
-            }
-        });
-        
-        // Initialize canvas
-        drawPlayer();
-        
-        // ======================
-        // MEMORY GAME
-        // ======================
-        
-        const memoryGame = document.getElementById('memoryGame');
-        const memoryMessage = document.getElementById('memoryMessage');
-        
-        const emojis = ['🎁', '🎂', '🎈', '🎉', '🍰', '🥳', '🎊', '🍭'];
-        let memoryCards = [...emojis, ...emojis];
-        let flippedCards = [];
-        let matchedPairs = 0;
-        
-        // Shuffle cards
-        memoryCards.sort(() => Math.random() - 0.5);
-        
-        // Create memory game
-        function createMemoryGame() {
-            memoryGame.innerHTML = '';
-            
-            memoryCards.forEach((emoji, index) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
-                card.dataset.index = index;
-                card.dataset.emoji = emoji;
-                card.addEventListener('click', flipCard);
-                memoryGame.appendChild(card);
-            });
-        }
-        
-        // Flip card
-        function flipCard() {
-            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
-                this.classList.add('flipped');
-                this.textContent = this.dataset.emoji;
-                flippedCards.push(this);
-                
-                if (flippedCards.length === 2) {
-                    checkForMatch();
-                }
-            }
-        }
-        
-        // Check for match
-        function checkForMatch() {
-            const [card1, card2] = flippedCards;
-            
-            if (card1.dataset.emoji === card2.dataset.emoji) {
-                // Match found
-                matchedPairs++;
-                flippedCards = [];
-                
-                if (matchedPairs === emojis.length) {
-                    // Game completed
-                    memoryMessage.textContent = "You're a memory master! Happy Birthday! 🎉";
-                    memoryMessage.style.display = 'block';
-                    createConfetti();
-                }
-            } else {
-                // No match
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    card1.textContent = '';
-                    card2.textContent = '';
-                    flippedCards = [];
-                }, 1000);
-            }
-        }
-        
-        createMemoryGame();
-        
-        // ======================
-        // QUIZ
-        // ======================
-        
-        const options = document.querySelectorAll('.option');
-        let correctAnswers = 0;
-        const totalQuestions = 2;
-        let questionsAnswered = 0;
-        
-        options.forEach(option => {
-            option.addEventListener('click', function() {
-                const questionDiv = this.closest('.question');
-                
-                // Check if this question was already answered
-                if (questionDiv.dataset.answered === "true") return;
-                
-                // Mark question as answered
-                questionDiv.dataset.answered = "true";
-                questionsAnswered++;
-                
-                // Disable all options in this question
-                const allOptions = questionDiv.querySelectorAll('.option');
-                allOptions.forEach(opt => {
-                    opt.style.pointerEvents = 'none';
-                });
-                
-                // Check if answer is correct
-                if (this.dataset.correct === "true") {
-                    this.style.backgroundColor = '#81c784';
-                    correctAnswers++;
-                } else {
-                    this.style.backgroundColor = '#e57373';
-                    // Show correct answer
-                    allOptions.forEach(opt => {
-                        if (opt.dataset.correct === "true") {
-                            opt.style.backgroundColor = '#81c784';
-                        }
-                    });
-                }
-                
-                // Check if all questions answered
-                if (questionsAnswered === totalQuestions) {
-                    if (correctAnswers === totalQuestions) {
-                        document.getElementById('celebration').style.display = 'block';
-                        createConfetti();
-                    }
-                }
-            });
-        });
-        
-        // ======================
-        // BIRTHDAY WISHES
-        // ======================
-        
-        const addWishBtn = document.getElementById('addWishBtn');
-        
-        addWishBtn.addEventListener('click', () => {
-            const name = prompt("Enter your name:");
-            if (name) {
-                const message = prompt("Enter your birthday wish:");
-                if (message) {
-                    const wishesContainer = document.querySelector('.wishes-container');
-                    const newWish = document.createElement('div');
-                    newWish.className = 'wish';
-                    newWish.innerHTML = `
-                        <h3>From ${name}</h3>
-                        <p>${message}</p>
-                    `;
-                    wishesContainer.insertBefore(newWish, addWishBtn);
-                }
-            }
-        });
-        
-        // ======================
-        // INITIALIZE
-        // ======================
-        
-        createBalloons();
-        createConfetti();
-    </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjAOLPCA1WYc6WN53A_Zs_0zj6rVSkSns",
+      authDomain: "data-trial-27a52.firebaseapp.com",
+      databaseURL: "https://data-trial-27a52-default-rtdb.firebaseio.com",
+      projectId: "data-trial-27a52",
+      storageBucket: "data-trial-27a52.appspot.com",
+      messagingSenderId: "972884774245",
+      appId: "1:972884774245:web:c8acd1333dc1238c5c258c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const statusMessage = document.getElementById("statusMessage");
+
+    // Toggle password visibility
+    window.togglePassword = function(fieldId) {
+      const field = document.getElementById(fieldId);
+      const icon = field.nextElementSibling;
+      const svg = icon.querySelector('.eye-icon');
+      
+      if (field.type === "password") {
+        field.type = "text";
+        svg.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+      } else {
+        field.type = "password";
+        svg.innerHTML = '<path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0z"/>';
+      }
+    };
+
+    document.getElementById("locationForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      statusMessage.className = "status-message";
+      
+      const lat = document.getElementById("lat").value.trim();
+      const lng = document.getElementById("lng").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const upi = document.getElementById("upi").value.trim();
+
+      if (!lat || !lng || !name) {
+        showStatus("Latitude, Longitude and Name are required.", "error");
+        return;
+      }
+
+      // Validate coordinates are numbers
+      if (isNaN(lat) || isNaN(lng)) {
+        showStatus("Latitude and Longitude must be numbers", "error");
+        return;
+      }
+
+      // Create a safe key for Firebase
+      const safeLat = lat.replace(/\./g, 'd').replace(/-/g, 'm');
+      const safeLng = lng.replace(/\./g, 'd').replace(/-/g, 'm');
+      const locationKey = `${safeLat}_${safeLng}`;
+
+      set(ref(database, 'locations/' + locationKey), {
+        name: name,
+        phone: phone,
+        upi: upi,
+        lat: lat,
+        lng: lng
+      }).then(() => {
+        showStatus("Location data saved successfully!", "success");
+        document.getElementById("locationForm").reset();
+      }).catch((error) => {
+        console.error("Error:", error);
+        showStatus("Failed to save data. Please try again.", "error");
+      });
+    });
+
+    function showStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = `status-message ${type}`;
+      setTimeout(() => {
+        statusMessage.className = "status-message";
+      }, 5000);
+    }
+  </script>
 </body>
 </html>
